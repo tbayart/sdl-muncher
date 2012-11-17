@@ -1,11 +1,11 @@
 /*
   First mini-graphics-game skeleton
-  Version A (based on console version M: arrays for dots, random positions)
+  Version B: ESC to exit the program
 */
  
 using System;
  
-public class Game02a
+public class Game02b
 {
     public static void Main()
     {
@@ -38,9 +38,10 @@ public class Game02a
         float[] incrXEnemy = { 5f, 3f, 6f, 4.5f };
                 
         int score = 0;
+        bool gameFinished = false;
  
         // Game Loop
-        while( 1 == 1 )
+        while( ! gameFinished )
         {
             // Draw
             SdlHardware.ClearScreen();
@@ -65,6 +66,9 @@ public class Game02a
             if (SdlHardware.KeyPressed(SdlHardware.KEY_LEFT)) x-=pacSpeed;
             if (SdlHardware.KeyPressed(SdlHardware.KEY_DOWN)) y+=pacSpeed;
             if (SdlHardware.KeyPressed(SdlHardware.KEY_UP)) y-=pacSpeed;
+            
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_ESC)) 
+                gameFinished = true;
                         
             // Move enemies and environment
             for(int i=0; i<amountOfEnemies; i++)
@@ -87,7 +91,3 @@ public class Game02a
         }
     }
 }
-
-// -----------------------------------------------------------
-
-// -----------------------------------------------------------
