@@ -1,11 +1,11 @@
 /*
   First mini-graphics-game skeleton
-  Version B: ESC to exit the program
+  Version C: Collisions between player and dots
 */
  
 using System;
  
-public class Game02b
+public class Game02c
 {
     public static void Main()
     {
@@ -80,7 +80,12 @@ public class Game02b
  
             // Collisions, lose energy or lives, etc
             for(int i=0; i<amountOfDots; i++)
-                if ((x == xDot[i]) && (y == yDot[i]) && visible[i])
+                if ( visible[i] &&
+                    (x > xDot[i] - 32) && 
+                    (x < xDot[i] + 32) &&
+                    (y > yDot[i] - 32) && 
+                    (y < yDot[i] + 32)
+                    )
                 {
                     score += 10;
                     visible[i] = false;
