@@ -1,11 +1,11 @@
 /*
   First mini-graphics-game skeleton
-  Version C: Collisions between player and dots
+  Version D: background map for the labyrinth
 */
  
 using System;
  
-public class Game02c
+public class Game02d
 {
     public static void Main()
     {
@@ -15,6 +15,7 @@ public class Game02c
         Image dotImage = new Image("dot.bmp");
         Image enemyImage = new Image("ghostGreen.bmp");
         Image pacImage = new Image("pac01r.bmp");
+        Image wallImage = new Image("wall.bmp");
         
         int x=40, y=12;
         int pacSpeed = 6;
@@ -37,6 +38,24 @@ public class Game02c
         float[] yEnemy = { 100, 200, 300, 400 };
         float[] incrXEnemy = { 5f, 3f, 6f, 4.5f };
                 
+        byte [,] map = {
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1},
+            {1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1},
+            {1,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,1},
+            {1,1,1,1,0,1,1,0,0,0,1,1,0,1,1,1,1},
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+            {1,1,1,1,0,1,0,1,0,1,0,1,0,1,1,1,1},
+            {1,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,1},
+            {1,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1},
+            {1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+        };
+        
         int score = 0;
         bool gameFinished = false;
  
@@ -46,6 +65,16 @@ public class Game02c
             // Draw
             SdlHardware.ClearScreen();
             //Console.Write("Score: {0}",score);
+            
+            // Background map
+            for(int row=0; row<15; row++)
+            {
+                for(int column=0; column<17; column++)
+                {
+                    if (map[row,column] == 1)
+                        SdlHardware.DrawHiddenImage(wallImage, column*32, row*32);
+                }
+            }
             
             for(int i=0; i<amountOfDots; i++)
             {
@@ -96,3 +125,7 @@ public class Game02c
         }
     }
 }
+
+// -----------------------------------------------------------
+
+// -----------------------------------------------------------
