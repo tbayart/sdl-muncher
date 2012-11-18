@@ -10,8 +10,13 @@
    ---------------------------------------------------
    0.01  30-Oct-2012  Nacho Cabanes
                       Basic Skeleton hiding SDL
-                      Allows only BMP images (no PNG, no JPG,
+                      Allows only BMP images (no PNG, no JPG,                    
                         no sound, no TTF, no mouse...)
+                      Class "Image" is also included in this file
+   0.02  16-Nov-2012  Nacho Cabanes
+                      Extended to allow PNG, JPG,
+                        MP3 sound, TTF fonts
+                      Class "Font" is also included in this file
  ---------------------------------------------------- */
 
 using System;
@@ -43,6 +48,8 @@ public class SdlHardware
         Sdl.SDL_Rect rect2 = 
           new Sdl.SDL_Rect(0,0, (short) width, (short) height);
         Sdl.SDL_SetClipRect(hiddenScreen, ref rect2);            
+
+        SdlTtf.TTF_Init();
     }
 
     public static void ClearScreen()
@@ -96,7 +103,24 @@ public class SdlHardware
       sw.Close();
       Console.WriteLine(text);
       Environment.Exit(1);
-    }    
+    }
+
+    public static void WriteHiddenText(string txt,
+      short x, short y, byte r, byte g, byte b, Font f)
+    {
+        Sdl.SDL_Color color = new Sdl.SDL_Color(r, g, b);
+        IntPtr textoComoImagen = SdlTtf.TTF_RenderText_Solid(
+          f.GetPointer(), txt, color);
+        if (textoComoImagen == IntPtr.Zero)
+            Environment.Exit(5);
+
+        Sdl.SDL_Rect origen = new Sdl.SDL_Rect(0, 0, width, height);
+        Sdl.SDL_Rect dest = new Sdl.SDL_Rect(x, y, width, height);
+
+        Sdl.SDL_BlitSurface(textoComoImagen, ref origen,
+          hiddenScreen, ref dest);
+    }
+
     
     // Private (auxiliar) methods
     
@@ -170,7 +194,7 @@ public class Image
     
     public  void Load(string fileName)
     {
-      internalPointer = Sdl.SDL_LoadBMP(fileName);
+      internalPointer = SdlImage.IMG_Load(fileName);
       if (internalPointer == IntPtr.Zero)
         SdlHardware.FatalError("Image not found: "+ fileName);
     }
@@ -181,3 +205,29 @@ public class Image
       return internalPointer;
     }
 } /* End of class image */
+
+
+// ---------------------------------------------------------------
+
+ 
+public class Font
+{
+    private IntPtr internalPointer;
+
+    public Font(string fileName, short sizePoints)
+    {
+        Load(fileName, sizePoints);
+    }
+
+    public void Load(string fileName, short sizePoints)
+    {
+        internalPointer = SdlTtf.TTF_OpenFont(fileName, sizePoints);
+        if (internalPointer == IntPtr.Zero)
+            SdlHardware.FatalError("Font not found: " + fileName);
+    }
+      
+    public  IntPtr GetPointer()
+    {
+      return internalPointer;
+    }
+} /* End of class Font */
