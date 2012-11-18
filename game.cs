@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version K: more detailed "Init", most variables become static attributes
+  Version L: PNG images, TTF texts
 */
 
 using System;
@@ -43,16 +43,18 @@ public class Game02f
             "-----------------"
     };
     static int score;
+    static Font sans18;
+
 
     public static void Init()
     {
         bool fullScreen = false;
         SdlHardware.Init(800, 600, 24, fullScreen);
 
-        dotImage = new Image("dot.bmp");
-        enemyImage = new Image("ghostGreen.bmp");
-        pacImage = new Image("pac01r.bmp");
-        wallImage = new Image("wall.bmp");
+        dotImage = new Image("data/dot.png");
+        enemyImage = new Image("data/ghostGreen.png");
+        pacImage = new Image("data/pac01r.png");
+        wallImage = new Image("data/wall.png");
 
         x = 32;
         y = 32;
@@ -90,17 +92,24 @@ public class Game02f
             }
         }
         score = 0;
+
+        // Font
+        sans18 = new Font("data/Joystix.ttf", 18);
     }
 
 
     public static void Intro()
     {
-        Image pac = new Image("pac01r.bmp");
-        Image ghost = new Image("ghostGreen.bmp");
+        Image pac = new Image("data/pac01r.png");
+        Image ghost = new Image("data/ghostGreen.png");        
         int x = -40;
         do
         {
             SdlHardware.ClearScreen();
+            SdlHardware.WriteHiddenText("Hit SPACE to start",
+                300, 500,
+                0xCC, 0xCC, 0xCC,
+                sans18);
             SdlHardware.DrawHiddenImage(ghost, x - 50, 300);
             SdlHardware.DrawHiddenImage(pac, x, 300);
             SdlHardware.ShowHiddenScreen();
@@ -167,6 +176,11 @@ public class Game02f
             for (int i = 0; i < amountOfEnemies; i++)
                 SdlHardware.DrawHiddenImage(enemyImage,
                     (int)xEnemy[i], (int)yEnemy[i]);
+
+            SdlHardware.WriteHiddenText("Score: "+score,
+                610, 100,
+                0x80, 0x80, 0xFF,
+                sans18);
 
             SdlHardware.ShowHiddenScreen();
 
