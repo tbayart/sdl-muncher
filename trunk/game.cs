@@ -1,17 +1,97 @@
 /*
   First mini-graphics-game skeleton
-  Version J: function CanMoveTo
+  Version K: more detailed "Init", most variables become static attributes
 */
 
 using System;
 
 public class Game02f
 {
+    static int x, y;
+    static int pacSpeed;
+    static int amountOfEnemies;
+
+    static float[] xEnemy = { 150, 400, 500, 600 };
+    static float[] yEnemy = { 100, 200, 300, 400 };
+    static float[] incrXEnemy = { 5f, 3f, 6f, 4.5f };
+
+    static int[] xDot;
+    static int[] yDot;
+    static bool[] visible;
+    static int amountOfDots;
+
+    static Image dotImage;
+    static Image enemyImage;
+    static Image pacImage;
+    static Image wallImage;
+
+    static string[] map = {
+            "-----------------",
+            "-.......-.......-",
+            "-.--.--.-.--.--.-",
+            "-...............-",
+            "-.--.-.---.-.--.-",
+            "-....-..-..-....-",
+            "----.--...--.----",
+            ".................",
+            "----.-.-.-.-.----",
+            "-....-.-.-.-....-",
+            "-.--.-.---.-.--.-",
+            "-...............-",
+            "-.--.-.---.-.--.-",
+            "-....-.....-....-",
+            "-----------------"
+    };
+    static int score;
+
     public static void Init()
     {
         bool fullScreen = false;
         SdlHardware.Init(800, 600, 24, fullScreen);
+
+        dotImage = new Image("dot.bmp");
+        enemyImage = new Image("ghostGreen.bmp");
+        pacImage = new Image("pac01r.bmp");
+        wallImage = new Image("wall.bmp");
+
+        x = 32;
+        y = 32;
+        pacSpeed = 4;
+
+        amountOfEnemies = 4;
+        
+        // Data for the dots
+        // First: count how many dots are there
+        amountOfDots = 0;
+        for (int row = 0; row < 15; row++)
+        {
+            for (int column = 0; column < 17; column++)
+            {
+                if (map[row][column] == '.')
+                    amountOfDots++;
+            }
+        }
+        xDot = new int[amountOfDots];
+        yDot = new int[amountOfDots];
+        visible = new bool[amountOfDots];
+        // Now, assign their coordinates
+        int currentDot = 0;
+        for (int row = 0; row < 15; row++)
+        {
+            for (int column = 0; column < 17; column++)
+            {
+                if (map[row][column] == '.')
+                {
+                    xDot[currentDot] = column * 32;
+                    yDot[currentDot] = row * 32;
+                    visible[currentDot] = true;
+                    currentDot++;
+                }
+            }
+        }
+        score = 0;
     }
+
 
     public static void Intro()
     {
@@ -56,75 +136,10 @@ public class Game02f
     public static void Main()
     {
         Init();
-
-        Image dotImage = new Image("dot.bmp");
-        Image enemyImage = new Image("ghostGreen.bmp");
-        Image pacImage = new Image("pac01r.bmp");
-        Image wallImage = new Image("wall.bmp");
-
-        int x = 32, y = 32;
-        int pacSpeed = 4;
-
-        int amountOfEnemies = 4;
-        float[] xEnemy = { 150, 400, 500, 600 };
-        float[] yEnemy = { 100, 200, 300, 400 };
-        float[] incrXEnemy = { 5f, 3f, 6f, 4.5f };
-
-        string[] map = {
-            "-----------------",
-            "-.......-.......-",
-            "-.--.--.-.--.--.-",
-            "-...............-",
-            "-.--.-.---.-.--.-",
-            "-....-..-..-....-",
-            "----.--...--.----",
-            ".................",
-            "----.-.-.-.-.----",
-            "-....-.-.-.-....-",
-            "-.--.-.---.-.--.-",
-            "-...............-",
-            "-.--.-.---.-.--.-",
-            "-....-.....-....-",
-            "-----------------"
-        };
-
-        // Data for the dots
-        // First: count how many
-        int amountOfDots = 0;
-        for (int row = 0; row < 15; row++)
-        {
-            for (int column = 0; column < 17; column++)
-            {
-                if (map[row][column] == '.')
-                    amountOfDots++;
-            }
-        }
-        int[] xDot = new int[amountOfDots];
-        int[] yDot = new int[amountOfDots];
-        bool[] visible = new bool[amountOfDots];
-        // Now, assign their coordinates
-        int currentDot = 0;
-        for (int row = 0; row < 15; row++)
-        {
-            for (int column = 0; column < 17; column++)
-            {
-                if (map[row][column] == '.')
-                {
-                    xDot[currentDot] = column * 32;
-                    yDot[currentDot] = row * 32;
-                    visible[currentDot] = true;
-                    currentDot++;
-                }
-            }
-        }
-
-
-        int score = 0;
-        bool gameFinished = false;
-
         Intro();
 
         // Game Loop
+        bool gameFinished = false;
         while (!gameFinished)
         {
             // Draw
