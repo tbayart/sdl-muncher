@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version I: functions Init and Intro
+  Version J: function CanMoveTo
 */
 
 using System;
@@ -21,17 +21,37 @@ public class Game02f
         do
         {
             SdlHardware.ClearScreen();
-            SdlHardware.DrawHiddenImage(ghost, x-50, 300);
-            SdlHardware.DrawHiddenImage(pac,x,300);
+            SdlHardware.DrawHiddenImage(ghost, x - 50, 300);
+            SdlHardware.DrawHiddenImage(pac, x, 300);
             SdlHardware.ShowHiddenScreen();
             x += 8;
-            if (x > 850) x = -40;      
+            if (x > 850) x = -40;
             SdlHardware.Pause(20);
         }
         while (!SdlHardware.KeyPressed(SdlHardware.KEY_SPC));
 
     }
 
+    public static bool CanMoveTo(int x, int y, string[] map)
+    {
+        bool canMove = true;
+        for (int row = 0; row < 15; row++)
+        {
+            for (int column = 0; column < 17; column++)
+            {
+                if (map[row][column] == '-')
+                    if ((x > column * 32 - 32) &&
+                        (x < column * 32 + 32) &&
+                        (y > row * 32 - 32) &&
+                        (y < row * 32 + 32)
+                        )
+                    {
+                        canMove = false;
+                    }
+            }
+        }
+        return canMove;
+    }
 
     public static void Main()
     {
@@ -136,93 +156,21 @@ public class Game02f
             SdlHardware.ShowHiddenScreen();
 
             // Read keys and calculate new position
-            if (SdlHardware.KeyPressed(SdlHardware.KEY_RIGHT))
-            {
-                bool canMove = true;
-                for (int row = 0; row < 15; row++)
-                {
-                    for (int column = 0; column < 17; column++)
-                    {
-                        if (map[row][column] == '-')
-                            if ((x + pacSpeed > column * 32 - 32) &&
-                                (x + pacSpeed < column * 32 + 32) &&
-                                (y > row * 32 - 32) &&
-                                (y < row * 32 + 32)
-                                )
-                            {
-                                canMove = false;
-                            }
-                    }
-                }
-                if (canMove)
-                    x += pacSpeed;
-            }
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_RIGHT)
+                    && CanMoveTo(x + pacSpeed, y, map))
+                x += pacSpeed;
 
-            if (SdlHardware.KeyPressed(SdlHardware.KEY_LEFT))
-            {
-                bool canMove = true;
-                for (int row = 0; row < 15; row++)
-                {
-                    for (int column = 0; column < 17; column++)
-                    {
-                        if (map[row][column] == '-')
-                            if ((x - pacSpeed > column * 32 - 32) &&
-                                (x - pacSpeed < column * 32 + 32) &&
-                                (y > row * 32 - 32) &&
-                                (y < row * 32 + 32)
-                                )
-                            {
-                                canMove = false;
-                            }
-                    }
-                }
-                if (canMove)
-                    x -= pacSpeed;
-            }
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_LEFT)
+                    && CanMoveTo(x - pacSpeed, y, map))
+                x -= pacSpeed;
 
-            if (SdlHardware.KeyPressed(SdlHardware.KEY_DOWN))
-            {
-                bool canMove = true;
-                for (int row = 0; row < 15; row++)
-                {
-                    for (int column = 0; column < 17; column++)
-                    {
-                        if (map[row][column] == '-')
-                            if ((x > column * 32 - 32) &&
-                                (x < column * 32 + 32) &&
-                                (y + pacSpeed > row * 32 - 32) &&
-                                (y + pacSpeed < row * 32 + 32)
-                                )
-                            {
-                                canMove = false;
-                            }
-                    }
-                }
-                if (canMove)
-                    y += pacSpeed;
-            }
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_DOWN)
+                    && CanMoveTo(x, y + pacSpeed, map))
+                y += pacSpeed;
 
-            if (SdlHardware.KeyPressed(SdlHardware.KEY_UP))
-            {
-                bool canMove = true;
-                for (int row = 0; row < 15; row++)
-                {
-                    for (int column = 0; column < 17; column++)
-                    {
-                        if (map[row][column] == '-')
-                            if ((x > column * 32 - 32) &&
-                                (x < column * 32 + 32) &&
-                                (y - pacSpeed > row * 32 - 32) &&
-                                (y - pacSpeed < row * 32 + 32)
-                                )
-                            {
-                                canMove = false;
-                            }
-                    }
-                }
-                if (canMove)
-                    y -= pacSpeed;
-            }
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_UP)
+                    && CanMoveTo(x, y - pacSpeed, map))
+                y -= pacSpeed;
 
             if (SdlHardware.KeyPressed(SdlHardware.KEY_ESC))
                 gameFinished = true;
