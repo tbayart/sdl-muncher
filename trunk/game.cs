@@ -1,16 +1,41 @@
 /*
   First mini-graphics-game skeleton
-  Version H: collisions with background
+  Version I: functions Init and Intro
 */
 
 using System;
 
 public class Game02f
 {
-    public static void Main()
+    public static void Init()
     {
         bool fullScreen = false;
         SdlHardware.Init(800, 600, 24, fullScreen);
+    }
+
+    public static void Intro()
+    {
+        Image pac = new Image("pac01r.bmp");
+        Image ghost = new Image("ghostGreen.bmp");
+        int x = -40;
+        do
+        {
+            SdlHardware.ClearScreen();
+            SdlHardware.DrawHiddenImage(ghost, x-50, 300);
+            SdlHardware.DrawHiddenImage(pac,x,300);
+            SdlHardware.ShowHiddenScreen();
+            x += 8;
+            if (x > 850) x = -40;      
+            SdlHardware.Pause(20);
+        }
+        while (!SdlHardware.KeyPressed(SdlHardware.KEY_SPC));
+
+    }
+
+
+    public static void Main()
+    {
+        Init();
 
         Image dotImage = new Image("dot.bmp");
         Image enemyImage = new Image("ghostGreen.bmp");
@@ -76,6 +101,8 @@ public class Game02f
 
         int score = 0;
         bool gameFinished = false;
+
+        Intro();
 
         // Game Loop
         while (!gameFinished)
