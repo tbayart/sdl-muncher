@@ -1,12 +1,15 @@
 /*
   First mini-graphics-game skeleton
-  Version L: PNG images, TTF texts
+  Version M: three lives
 */
 
 using System;
 
-public class Game02f
+public class SdlMuncher
 {
+    static int startX = 32 * 8;
+    static int startY = 32 * 8;
+    static int lives = 3;
     static int x, y;
     static int pacSpeed;
     static int amountOfEnemies;
@@ -56,8 +59,8 @@ public class Game02f
         pacImage = new Image("data/pac01r.png");
         wallImage = new Image("data/wall.png");
 
-        x = 32;
-        y = 32;
+        x = startX;
+        y = startY;
         pacSpeed = 4;
 
         amountOfEnemies = 4;
@@ -182,6 +185,11 @@ public class Game02f
                 0x80, 0x80, 0xFF,
                 sans18);
 
+            SdlHardware.WriteHiddenText("Lives: " + lives,
+                610, 140,
+                0x80, 0x80, 0xFF,
+                sans18);
+
             SdlHardware.ShowHiddenScreen();
 
             // Read keys and calculate new position
@@ -223,6 +231,21 @@ public class Game02f
                 {
                     score += 10;
                     visible[i] = false;
+                }
+
+            for (int i = 0; i < amountOfEnemies; i++)
+                if (
+                    (x > xEnemy[i] - 32) &&
+                    (x < xEnemy[i] + 32) &&
+                    (y > yEnemy[i] - 32) &&
+                    (y < yEnemy[i] + 32)
+                    )
+                {
+                    x = startX;
+                    y = startY;
+                    lives--;
+                    if (lives == 0)
+                        gameFinished = true;
                 }
 
             // Pause till next fotogram
