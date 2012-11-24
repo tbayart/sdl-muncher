@@ -1,28 +1,37 @@
 /*
   First mini-graphics-game skeleton
-  Version N: restarting a game
+  Version O: array of structs
 */
 
 using System;
 
 public class SdlMuncher
 {
+    struct Dot
+    {
+        public int x;
+        public int y;
+        public bool visible;
+    }
+    static Dot[] dots;
+    static int amountOfDots;
+
+    struct Enemy
+    {
+        public float x;
+        public float y;
+        public float xSpeed;
+        public float ySpeed;
+    }
+    static Enemy[] enemies;
+    static int amountOfEnemies;
+
     static bool sessionFinished = false;
     static int startX = 32 * 8;
     static int startY = 32 * 8;
     static int lives;
     static int x, y;
-    static int pacSpeed;
-    static int amountOfEnemies;
-
-    static float[] xEnemy;
-    static float[] yEnemy;
-    static float[] incrXEnemy;
-
-    static int[] xDot;
-    static int[] yDot;
-    static bool[] visible;
-    static int amountOfDots;
+    static int pacSpeed;        
 
     static Image dotImage;
     static Image enemyImage;
@@ -61,19 +70,6 @@ public class SdlMuncher
         wallImage = new Image("data/wall.png");
 
         sans18 = new Font("data/Joystix.ttf", 18);
-    }
-
-
-    public static void PrepareGameStart()
-    {
-        x = startX;
-        y = startY;
-        pacSpeed = 4;
-
-        amountOfEnemies = 4;
-        xEnemy = new float[] { 150, 400, 500, 600 };
-        yEnemy = new float[] { 100, 200, 300, 400 };
-        incrXEnemy = new float[] { 5f, 3f, 6f, 4.5f };
 
         // Data for the dots
         // First: count how many dots are there
@@ -86,9 +82,8 @@ public class SdlMuncher
                     amountOfDots++;
             }
         }
-        xDot = new int[amountOfDots];
-        yDot = new int[amountOfDots];
-        visible = new bool[amountOfDots];
+        dots = new Dot[amountOfDots];
+
         // Now, assign their coordinates
         int currentDot = 0;
         for (int row = 0; row < 15; row++)
@@ -97,13 +92,37 @@ public class SdlMuncher
             {
                 if (map[row][column] == '.')
                 {
-                    xDot[currentDot] = column * 32;
-                    yDot[currentDot] = row * 32;
-                    visible[currentDot] = true;
+                    dots[currentDot].x = column * 32;
+                    dots[currentDot].y = row * 32;
                     currentDot++;
                 }
             }
         }
+
+        // And enemies
+        amountOfEnemies = 4;
+        enemies = new Enemy[amountOfEnemies];        
+    }
+
+
+    public static void PrepareGameStart()
+    {
+        // Pac coordinates and speed
+        x = startX;
+        y = startY;
+        pacSpeed = 4;
+
+        // Coordinates for the enemies        
+        enemies[0].x = 150; enemies[0].y = 100; enemies[0].xSpeed = 5;
+        enemies[1].x = 400; enemies[1].y = 200; enemies[1].xSpeed = 3;
+        enemies[2].x = 500; enemies[2].y = 300; enemies[2].xSpeed = 6;
+        enemies[3].x = 600; enemies[3].y = 400; enemies[3].xSpeed = 4.5f;
+
+        // All dots must be visible
+        for (int i = 0; i < amountOfDots; i++)
+            dots[i].visible = true;
+
+        // Resto of data for a new game
         score = 0;
         lives = 3;
     }
@@ -193,15 +212,15 @@ public class SdlMuncher
 
                 for (int i = 0; i < amountOfDots; i++)
                 {
-                    if (visible[i])
-                        SdlHardware.DrawHiddenImage(dotImage, xDot[i], yDot[i]);
+                    if (dots[i].visible)
+                        SdlHardware.DrawHiddenImage(dotImage, dots[i].x, dots[i].y);
                 }
 
                 SdlHardware.DrawHiddenImage(pacImage, x, y);
 
                 for (int i = 0; i < amountOfEnemies; i++)
                     SdlHardware.DrawHiddenImage(enemyImage,
-                        (int)xEnemy[i], (int)yEnemy[i]);
+                        (int)enemies[i].x, (int)enemies[i].y);
 
                 SdlHardware.WriteHiddenText("Score: " + score,
                     610, 100,
@@ -238,30 +257,30 @@ public class SdlMuncher
                 // Move enemies and environment
                 for (int i = 0; i < amountOfEnemies; i++)
                 {
-                    xEnemy[i] += incrXEnemy[i];
-                    if ((xEnemy[i] < 1) || (xEnemy[i] > 760))
-                        incrXEnemy[i] = -incrXEnemy[i];
+                    enemies[i].x += enemies[i].xSpeed;
+                    if ((enemies[i].x < 1) || (enemies[i].x > 760))
+                        enemies[i].xSpeed = -enemies[i].xSpeed;
                 }
 
                 // Collisions, lose energy or lives, etc
                 for (int i = 0; i < amountOfDots; i++)
-                    if (visible[i] &&
-                        (x > xDot[i] - 32) &&
-                        (x < xDot[i] + 32) &&
-                        (y > yDot[i] - 32) &&
-                        (y < yDot[i] + 32)
+                    if (dots[i].visible &&
+                        (x > dots[i].x - 32) &&
+                        (x < dots[i].x + 32) &&
+                        (y > dots[i].y - 32) &&
+                        (y < dots[i].y + 32)
                         )
                     {
                         score += 10;
-                        visible[i] = false;
+                        dots[i].visible = false;
                     }
 
                 for (int i = 0; i < amountOfEnemies; i++)
                     if (
-                        (x > xEnemy[i] - 32) &&
-                        (x < xEnemy[i] + 32) &&
-                        (y > yEnemy[i] - 32) &&
-                        (y < yEnemy[i] + 32)
+                        (x > enemies[i].x - 32) &&
+                        (x < enemies[i].x + 32) &&
+                        (y > enemies[i].y - 32) &&
+                        (y < enemies[i].y + 32)
                         )
                     {
                         x = startX;
