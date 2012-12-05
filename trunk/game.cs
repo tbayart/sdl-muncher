@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version P: more functions
+  Version Q: ghosts in the labyrinth
 */
 
 using System;
@@ -114,10 +114,10 @@ public class SdlMuncher
         pacSpeed = 4;
 
         // Coordinates for the enemies        
-        enemies[0].x = 150; enemies[0].y = 100; enemies[0].xSpeed = 5;
-        enemies[1].x = 400; enemies[1].y = 200; enemies[1].xSpeed = 3;
-        enemies[2].x = 500; enemies[2].y = 300; enemies[2].xSpeed = 6;
-        enemies[3].x = 600; enemies[3].y = 400; enemies[3].xSpeed = 4.5f;
+        enemies[0].x = 32; enemies[0].y = 1 * 32; enemies[0].xSpeed = 4;
+        enemies[1].x = 32; enemies[1].y = 3 * 32; enemies[1].xSpeed = 4;
+        enemies[2].x = 3 * 32; enemies[2].y = 9 * 32; enemies[2].xSpeed = -4;
+        enemies[3].x = 32; enemies[3].y = 11 * 32; enemies[3].xSpeed = 4;
 
         // All dots must be visible
         for (int i = 0; i < amountOfDots; i++)
@@ -308,8 +308,10 @@ public class SdlMuncher
         // Move enemies and environment
         for (int i = 0; i < amountOfEnemies; i++)
         {
-            enemies[i].x += enemies[i].xSpeed;
-            if ((enemies[i].x < 1) || (enemies[i].x > 760))
+            if (CanMoveTo((int)(enemies[i].x + enemies[i].xSpeed),
+                    (int)enemies[i].y, map))
+                enemies[i].x += enemies[i].xSpeed;
+            else
                 enemies[i].xSpeed = -enemies[i].xSpeed;
         }
     }
