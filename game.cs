@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version O: array of structs
+  Version P: more functions
 */
 
 using System;
@@ -31,7 +31,7 @@ public class SdlMuncher
     static int startY = 32 * 8;
     static int lives;
     static int x, y;
-    static int pacSpeed;        
+    static int pacSpeed;
 
     static Image dotImage;
     static Image enemyImage;
@@ -57,6 +57,7 @@ public class SdlMuncher
     };
     static int score;
     static Font sans18;
+    static bool gameFinished;
 
 
     public static void Init()
@@ -101,7 +102,7 @@ public class SdlMuncher
 
         // And enemies
         amountOfEnemies = 4;
-        enemies = new Enemy[amountOfEnemies];        
+        enemies = new Enemy[amountOfEnemies];
     }
 
 
@@ -130,27 +131,38 @@ public class SdlMuncher
 
     public static void Intro()
     {
-        Image pac = new Image("data/pac01r.png");
-        Image ghost = new Image("data/ghostGreen.png");        
         int x = -40;
         bool exitIntro = false;
         do
         {
             SdlHardware.ClearScreen();
             SdlHardware.WriteHiddenText("Hit SPACE to start",
-                300, 500,
+                300, 400,
                 0xCC, 0xCC, 0xCC,
                 sans18);
-            SdlHardware.WriteHiddenText("or Q to Quit",
-                340, 540,
-                0x99, 0x99, 0x99,
+            SdlHardware.WriteHiddenText("or H for Help",
+                330, 440,
+                0xAA, 0xAA, 0xAA,
                 sans18);
-            SdlHardware.DrawHiddenImage(ghost, x - 50, 300);
-            SdlHardware.DrawHiddenImage(pac, x, 300);
+            SdlHardware.WriteHiddenText("or C for Credits",
+                310, 480,
+                0x88, 0x88, 0x88,
+                sans18);
+            SdlHardware.WriteHiddenText("or Q to Quit",
+                340, 520,
+                0x66, 0x66, 0x66,
+                sans18);
+
+            SdlHardware.DrawHiddenImage(enemyImage, x - 50, 300);
+            SdlHardware.DrawHiddenImage(pacImage, x, 300);
             SdlHardware.ShowHiddenScreen();
             x += 8;
             if (x > 850) x = -40;
             SdlHardware.Pause(20);
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_C))
+                ShowCredits();
+            if (SdlHardware.KeyPressed(SdlHardware.KEY_H))
+                ShowHelp();
             if (SdlHardware.KeyPressed(SdlHardware.KEY_SPC))
                 exitIntro = true;
             if (SdlHardware.KeyPressed(SdlHardware.KEY_Q))
@@ -161,6 +173,47 @@ public class SdlMuncher
         }
         while (!exitIntro);
     }
+
+
+    public static void ShowCredits()
+    {
+        SdlHardware.ClearScreen();
+        SdlHardware.WriteHiddenText("By DAM Ies San Vicente 2012-2013",
+            200, 500,
+            0xCC, 0xCC, 0xCC,
+            sans18);
+        SdlHardware.WriteHiddenText("Hit ESC to return",
+            300, 540,
+            0x99, 0x99, 0x99,
+            sans18);
+        SdlHardware.ShowHiddenScreen();
+        do
+        {
+            SdlHardware.Pause(20);
+        }
+        while (!SdlHardware.KeyPressed(SdlHardware.KEY_ESC));
+    }
+
+
+    public static void ShowHelp()
+    {
+        SdlHardware.ClearScreen();
+        SdlHardware.WriteHiddenText("Eat the dots, avoid the ghosts.",
+            200, 500,
+            0xCC, 0xCC, 0xCC,
+            sans18);
+        SdlHardware.WriteHiddenText("Hit ESC to return",
+            300, 540,
+            0x99, 0x99, 0x99,
+            sans18);
+        SdlHardware.ShowHiddenScreen();
+        do
+        {
+            SdlHardware.Pause(20);
+        }
+        while (!SdlHardware.KeyPressed(SdlHardware.KEY_ESC));
+    }
+
 
     public static bool CanMoveTo(int x, int y, string[] map)
     {
@@ -183,6 +236,123 @@ public class SdlMuncher
         return canMove;
     }
 
+
+    public static void DrawElements()
+    {
+        // Draw
+        SdlHardware.ClearScreen();
+        //Console.Write("Score: {0}",score);
+
+        // Background map
+        for (int row = 0; row < 15; row++)
+        {
+            for (int column = 0; column < 17; column++)
+            {
+                if (map[row][column] == '-')
+                    SdlHardware.DrawHiddenImage(wallImage, column * 32, row * 32);
+            }
+        }
+
+        for (int i = 0; i < amountOfDots; i++)
+        {
+            if (dots[i].visible)
+                SdlHardware.DrawHiddenImage(dotImage, dots[i].x, dots[i].y);
+        }
+
+        SdlHardware.DrawHiddenImage(pacImage, x, y);
+
+        for (int i = 0; i < amountOfEnemies; i++)
+            SdlHardware.DrawHiddenImage(enemyImage,
+                (int)enemies[i].x, (int)enemies[i].y);
+
+        SdlHardware.WriteHiddenText("Score: " + score,
+            610, 100,
+            0x80, 0x80, 0xFF,
+            sans18);
+
+        SdlHardware.WriteHiddenText("Lives: " + lives,
+            610, 140,
+            0x80, 0x80, 0xFF,
+            sans18);
+
+        SdlHardware.ShowHiddenScreen();
+    }
+
+
+    public static void CheckInputDevices()
+    {
+        // Read keys and calculate new position
+        if (SdlHardware.KeyPressed(SdlHardware.KEY_RIGHT)
+                && CanMoveTo(x + pacSpeed, y, map))
+            x += pacSpeed;
+
+        if (SdlHardware.KeyPressed(SdlHardware.KEY_LEFT)
+                && CanMoveTo(x - pacSpeed, y, map))
+            x -= pacSpeed;
+
+        if (SdlHardware.KeyPressed(SdlHardware.KEY_DOWN)
+                && CanMoveTo(x, y + pacSpeed, map))
+            y += pacSpeed;
+
+        if (SdlHardware.KeyPressed(SdlHardware.KEY_UP)
+                && CanMoveTo(x, y - pacSpeed, map))
+            y -= pacSpeed;
+
+        if (SdlHardware.KeyPressed(SdlHardware.KEY_ESC))
+            gameFinished = true;
+    }
+
+
+    public static void MoveElements()
+    {
+        // Move enemies and environment
+        for (int i = 0; i < amountOfEnemies; i++)
+        {
+            enemies[i].x += enemies[i].xSpeed;
+            if ((enemies[i].x < 1) || (enemies[i].x > 760))
+                enemies[i].xSpeed = -enemies[i].xSpeed;
+        }
+    }
+
+
+    public static void CheckCollisions()
+    {
+        // Collisions, lose energy or lives, etc
+        for (int i = 0; i < amountOfDots; i++)
+            if (dots[i].visible &&
+                (x > dots[i].x - 32) &&
+                (x < dots[i].x + 32) &&
+                (y > dots[i].y - 32) &&
+                (y < dots[i].y + 32)
+                )
+            {
+                score += 10;
+                dots[i].visible = false;
+            }
+
+        for (int i = 0; i < amountOfEnemies; i++)
+            if (
+                (x > enemies[i].x - 32) &&
+                (x < enemies[i].x + 32) &&
+                (y > enemies[i].y - 32) &&
+                (y < enemies[i].y + 32)
+                )
+            {
+                x = startX;
+                y = startY;
+                lives--;
+                if (lives == 0)
+                    gameFinished = true;
+            }
+    }
+
+
+    public static void PauseTillNextFrame()
+    {
+        SdlHardware.Pause(40);
+    }
+
+
     public static void Main()
     {
         Init();
@@ -193,105 +363,14 @@ public class SdlMuncher
             PrepareGameStart();
 
             // Game Loop
-            bool gameFinished = false;
+            gameFinished = false;
             while (!gameFinished)
             {
-                // Draw
-                SdlHardware.ClearScreen();
-                //Console.Write("Score: {0}",score);
-
-                // Background map
-                for (int row = 0; row < 15; row++)
-                {
-                    for (int column = 0; column < 17; column++)
-                    {
-                        if (map[row][column] == '-')
-                            SdlHardware.DrawHiddenImage(wallImage, column * 32, row * 32);
-                    }
-                }
-
-                for (int i = 0; i < amountOfDots; i++)
-                {
-                    if (dots[i].visible)
-                        SdlHardware.DrawHiddenImage(dotImage, dots[i].x, dots[i].y);
-                }
-
-                SdlHardware.DrawHiddenImage(pacImage, x, y);
-
-                for (int i = 0; i < amountOfEnemies; i++)
-                    SdlHardware.DrawHiddenImage(enemyImage,
-                        (int)enemies[i].x, (int)enemies[i].y);
-
-                SdlHardware.WriteHiddenText("Score: " + score,
-                    610, 100,
-                    0x80, 0x80, 0xFF,
-                    sans18);
-
-                SdlHardware.WriteHiddenText("Lives: " + lives,
-                    610, 140,
-                    0x80, 0x80, 0xFF,
-                    sans18);
-
-                SdlHardware.ShowHiddenScreen();
-
-                // Read keys and calculate new position
-                if (SdlHardware.KeyPressed(SdlHardware.KEY_RIGHT)
-                        && CanMoveTo(x + pacSpeed, y, map))
-                    x += pacSpeed;
-
-                if (SdlHardware.KeyPressed(SdlHardware.KEY_LEFT)
-                        && CanMoveTo(x - pacSpeed, y, map))
-                    x -= pacSpeed;
-
-                if (SdlHardware.KeyPressed(SdlHardware.KEY_DOWN)
-                        && CanMoveTo(x, y + pacSpeed, map))
-                    y += pacSpeed;
-
-                if (SdlHardware.KeyPressed(SdlHardware.KEY_UP)
-                        && CanMoveTo(x, y - pacSpeed, map))
-                    y -= pacSpeed;
-
-                if (SdlHardware.KeyPressed(SdlHardware.KEY_ESC))
-                    gameFinished = true;
-
-                // Move enemies and environment
-                for (int i = 0; i < amountOfEnemies; i++)
-                {
-                    enemies[i].x += enemies[i].xSpeed;
-                    if ((enemies[i].x < 1) || (enemies[i].x > 760))
-                        enemies[i].xSpeed = -enemies[i].xSpeed;
-                }
-
-                // Collisions, lose energy or lives, etc
-                for (int i = 0; i < amountOfDots; i++)
-                    if (dots[i].visible &&
-                        (x > dots[i].x - 32) &&
-                        (x < dots[i].x + 32) &&
-                        (y > dots[i].y - 32) &&
-                        (y < dots[i].y + 32)
-                        )
-                    {
-                        score += 10;
-                        dots[i].visible = false;
-                    }
-
-                for (int i = 0; i < amountOfEnemies; i++)
-                    if (
-                        (x > enemies[i].x - 32) &&
-                        (x < enemies[i].x + 32) &&
-                        (y > enemies[i].y - 32) &&
-                        (y < enemies[i].y + 32)
-                        )
-                    {
-                        x = startX;
-                        y = startY;
-                        lives--;
-                        if (lives == 0)
-                            gameFinished = true;
-                    }
-
-                // Pause till next fotogram
-                SdlHardware.Pause(40);
+                DrawElements();
+                CheckInputDevices();
+                MoveElements();
+                CheckCollisions();
+                PauseTillNextFrame();
             } // end of game loop
 
             Intro();
