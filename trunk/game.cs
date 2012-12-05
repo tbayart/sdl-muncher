@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version Q: ghosts in the labyrinth
+  Version R: ghosts with random movement
 */
 
 using System;
@@ -58,6 +58,7 @@ public class SdlMuncher
     static int score;
     static Font sans18;
     static bool gameFinished;
+    static Random randomGenerator;
 
 
     public static void Init()
@@ -103,6 +104,8 @@ public class SdlMuncher
         // And enemies
         amountOfEnemies = 4;
         enemies = new Enemy[amountOfEnemies];
+
+        randomGenerator = new Random();
     }
 
 
@@ -309,10 +312,33 @@ public class SdlMuncher
         for (int i = 0; i < amountOfEnemies; i++)
         {
             if (CanMoveTo((int)(enemies[i].x + enemies[i].xSpeed),
-                    (int)enemies[i].y, map))
+                    (int)(enemies[i].y + enemies[i].ySpeed), map))
+            {
                 enemies[i].x += enemies[i].xSpeed;
+                enemies[i].y += enemies[i].ySpeed;
+            }
             else
-                enemies[i].xSpeed = -enemies[i].xSpeed;
+            {
+                switch (randomGenerator.Next(0, 4))
+                {
+                    case 0: // Next move: to the right
+                        enemies[i].xSpeed = 4;
+                        enemies[i].ySpeed = 0;
+                        break;
+                    case 1: // Next move: to the left
+                        enemies[i].xSpeed = -4;
+                        enemies[i].ySpeed = 0;
+                        break;
+                    case 2: // Next move: upwards
+                        enemies[i].xSpeed = 0;
+                        enemies[i].ySpeed = -4;
+                        break;
+                    case 3: // Next move: downwards
+                        enemies[i].xSpeed = 0;
+                        enemies[i].ySpeed = 4;
+                        break;
+                }
+            }
         }
     }
 
