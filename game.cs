@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version R: ghosts with random movement
+  Version S: restarting a level
 */
 
 using System;
@@ -15,6 +15,7 @@ public class SdlMuncher
     }
     static Dot[] dots;
     static int amountOfDots;
+    static int remainingDots;
 
     struct Enemy
     {
@@ -25,6 +26,7 @@ public class SdlMuncher
     }
     static Enemy[] enemies;
     static int amountOfEnemies;
+    static int enemySpeed;
 
     static bool sessionFinished = false;
     static int startX = 32 * 8;
@@ -117,14 +119,16 @@ public class SdlMuncher
         pacSpeed = 4;
 
         // Coordinates for the enemies        
-        enemies[0].x = 32; enemies[0].y = 1 * 32; enemies[0].xSpeed = 4;
-        enemies[1].x = 32; enemies[1].y = 3 * 32; enemies[1].xSpeed = 4;
-        enemies[2].x = 3 * 32; enemies[2].y = 9 * 32; enemies[2].xSpeed = -4;
-        enemies[3].x = 32; enemies[3].y = 11 * 32; enemies[3].xSpeed = 4;
+        enemySpeed = 4;
+        enemies[0].x = 32; enemies[0].y = 1 * 32; enemies[0].xSpeed = enemySpeed;
+        enemies[1].x = 32; enemies[1].y = 3 * 32; enemies[1].xSpeed = enemySpeed;
+        enemies[2].x = 3 * 32; enemies[2].y = 9 * 32; enemies[2].xSpeed = -enemySpeed;
+        enemies[3].x = 32; enemies[3].y = 11 * 32; enemies[3].xSpeed = enemySpeed;
 
         // All dots must be visible
         for (int i = 0; i < amountOfDots; i++)
             dots[i].visible = true;
+        remainingDots = amountOfDots;
 
         // Resto of data for a new game
         score = 0;
@@ -322,20 +326,20 @@ public class SdlMuncher
                 switch (randomGenerator.Next(0, 4))
                 {
                     case 0: // Next move: to the right
-                        enemies[i].xSpeed = 4;
+                        enemies[i].xSpeed = enemySpeed;
                         enemies[i].ySpeed = 0;
                         break;
                     case 1: // Next move: to the left
-                        enemies[i].xSpeed = -4;
+                        enemies[i].xSpeed = -enemySpeed;
                         enemies[i].ySpeed = 0;
                         break;
                     case 2: // Next move: upwards
                         enemies[i].xSpeed = 0;
-                        enemies[i].ySpeed = -4;
+                        enemies[i].ySpeed = -enemySpeed;
                         break;
                     case 3: // Next move: downwards
                         enemies[i].xSpeed = 0;
-                        enemies[i].ySpeed = 4;
+                        enemies[i].ySpeed = enemySpeed;
                         break;
                 }
             }
@@ -356,6 +360,9 @@ public class SdlMuncher
             {
                 score += 10;
                 dots[i].visible = false;
+                remainingDots--;
+                if (remainingDots == 0)
+                    AdvanceLevel();
             }
 
         for (int i = 0; i < amountOfEnemies; i++)
@@ -378,6 +385,18 @@ public class SdlMuncher
     public static void PauseTillNextFrame()
     {
         SdlHardware.Pause(40);
+    }
+
+
+    public static void AdvanceLevel()
+    {
+        x = startX;
+        y = startY;
+
+        for (int i = 0; i < amountOfDots; i++)
+            dots[i].visible = true;
+
+        enemySpeed += 4;
     }
 
 
