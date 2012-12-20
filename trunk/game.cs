@@ -1,6 +1,6 @@
 /*
   First mini-graphics-game skeleton
-  Version S: restarting a level
+  Version T: eating big dots and ghosts
 */
 
 using System;
@@ -12,6 +12,7 @@ public class SdlMuncher
         public int x;
         public int y;
         public bool visible;
+        public bool isBig;
     }
     static Dot[] dots;
     static int amountOfDots;
@@ -23,6 +24,7 @@ public class SdlMuncher
         public float y;
         public float xSpeed;
         public float ySpeed;
+        public bool visible;
     }
     static Enemy[] enemies;
     static int amountOfEnemies;
@@ -36,13 +38,15 @@ public class SdlMuncher
     static int pacSpeed;
 
     static Image dotImage;
-    static Image enemyImage;
+    static Image bigDotImage;
+    static Image[] enemyImage;
+    static Image enemyGreyImage;
     static Image pacImage;
     static Image wallImage;
 
     static string[] map = {
             "-----------------",
-            "-.......-.......-",
+            "-o......-......o-",
             "-.--.--.-.--.--.-",
             "-...............-",
             "-.--.-.---.-.--.-",
@@ -54,13 +58,15 @@ public class SdlMuncher
             "-.--.-.---.-.--.-",
             "-...............-",
             "-.--.-.---.-.--.-",
-            "-....-.....-....-",
+            "-o...-.....-...o-",
             "-----------------"
     };
     static int score;
     static Font sans18;
     static bool gameFinished;
     static Random randomGenerator;
+    static bool ghostCatchingMode;
+    static int ghostChasingTime;
 
 
     public static void Init()
@@ -69,7 +75,13 @@ public class SdlMuncher
         SdlHardware.Init(800, 600, 24, fullScreen);
 
         dotImage = new Image("data/dot.png");
-        enemyImage = new Image("data/ghostGreen.png");
+        bigDotImage = new Image("data/bigDot.png");
+        enemyImage = new Image[4];
+        enemyImage[0] = new Image("data/ghostGreen.png");
+        enemyImage[1] = new Image("data/ghostBlue.png");
+        enemyImage[2] = new Image("data/ghostRed.png");
+        enemyImage[3] = new Image("data/ghostPurple.png");
+        enemyGreyImage = new Image("data/ghostGrey.png");
         pacImage = new Image("data/pac01r.png");
         wallImage = new Image("data/wall.png");
 
@@ -82,7 +94,7 @@ public class SdlMuncher
         {
             for (int column = 0; column < 17; column++)
             {
-                if (map[row][column] == '.')
+                if ((map[row][column] == '.') || (map[row][column] == 'o'))
                     amountOfDots++;
             }
         }
@@ -94,10 +106,14 @@ public class SdlMuncher
         {
             for (int column = 0; column < 17; column++)
             {
-                if (map[row][column] == '.')
+                if ((map[row][column] == '.') || (map[row][column] == 'o'))
                 {
                     dots[currentDot].x = column * 32;
                     dots[currentDot].y = row * 32;
+                    if (map[row][column] == '.')
+                        dots[currentDot].isBig = false;
+                    else
+                        dots[currentDot].isBig = true;
                     currentDot++;
                 }
             }
@@ -124,15 +140,19 @@ public class SdlMuncher
         enemies[1].x = 32; enemies[1].y = 3 * 32; enemies[1].xSpeed = enemySpeed;
         enemies[2].x = 3 * 32; enemies[2].y = 9 * 32; enemies[2].xSpeed = -enemySpeed;
         enemies[3].x = 32; enemies[3].y = 11 * 32; enemies[3].xSpeed = enemySpeed;
+        enemies[0].visible = enemies[1].visible = enemies[2].visible =
+            enemies[3].visible = true;
 
         // All dots must be visible
         for (int i = 0; i < amountOfDots; i++)
             dots[i].visible = true;
         remainingDots = amountOfDots;
 
-        // Resto of data for a new game
+        // Rest of data for a new game
         score = 0;
         lives = 3;
+        ghostCatchingMode = false;
+        ghostChasingTime = 200;
     }
 
 
@@ -160,7 +180,7 @@ public class SdlMuncher
                 0x66, 0x66, 0x66,
                 sans18);
 
-            SdlHardware.DrawHiddenImage(enemyImage, x - 50, 300);
+            SdlHardware.DrawHiddenImage(enemyImage[0], x - 50, 300);
             SdlHardware.DrawHiddenImage(pacImage, x, 300);
             SdlHardware.ShowHiddenScreen();
             x += 8;
@@ -263,14 +283,25 @@ public class SdlMuncher
         for (int i = 0; i < amountOfDots; i++)
         {
             if (dots[i].visible)
-                SdlHardware.DrawHiddenImage(dotImage, dots[i].x, dots[i].y);
+            {
+                if (dots[i].isBig)
+                    SdlHardware.DrawHiddenImage(bigDotImage, dots[i].x, dots[i].y);
+                else
+                    SdlHardware.DrawHiddenImage(dotImage, dots[i].x, dots[i].y);
+            }
         }
 
         SdlHardware.DrawHiddenImage(pacImage, x, y);
 
         for (int i = 0; i < amountOfEnemies; i++)
-            SdlHardware.DrawHiddenImage(enemyImage,
-                (int)enemies[i].x, (int)enemies[i].y);
+            if (enemies[i].visible)
+                if (ghostCatchingMode)
+                    SdlHardware.DrawHiddenImage(enemyGreyImage,
+                        (int)enemies[i].x, (int)enemies[i].y);
+                else
+                    SdlHardware.DrawHiddenImage(enemyImage[i],
+                    (int)enemies[i].x, (int)enemies[i].y);
+
 
         SdlHardware.WriteHiddenText("Score: " + score,
             610, 100,
@@ -344,6 +375,15 @@ public class SdlMuncher
                 }
             }
         }
+        // Decrease ghost chasing time
+        if (ghostCatchingMode)
+            ghostChasingTime--;
+        if (ghostChasingTime <= 0)
+        {
+            ghostChasingTime = 200;
+            ghostCatchingMode = false;
+        }
+
     }
 
 
@@ -358,27 +398,44 @@ public class SdlMuncher
                 (y < dots[i].y + 32)
                 )
             {
-                score += 10;
                 dots[i].visible = false;
                 remainingDots--;
                 if (remainingDots == 0)
                     AdvanceLevel();
+                if (dots[i].isBig)
+                {
+                    score += 50;
+                    ghostCatchingMode = true;
+                }
+                else
+                {
+                    score += 10;
+                }
             }
 
         for (int i = 0; i < amountOfEnemies; i++)
-            if (
-                (x > enemies[i].x - 32) &&
-                (x < enemies[i].x + 32) &&
-                (y > enemies[i].y - 32) &&
-                (y < enemies[i].y + 32)
-                )
-            {
-                x = startX;
-                y = startY;
-                lives--;
-                if (lives == 0)
-                    gameFinished = true;
-            }
+            if (enemies[i].visible)
+                if (
+                    (x > enemies[i].x - 32) &&
+                    (x < enemies[i].x + 32) &&
+                    (y > enemies[i].y - 32) &&
+                    (y < enemies[i].y + 32)
+                    )
+                {
+                    if (ghostCatchingMode)
+                    {
+                        enemies[i].visible = false;
+                        score += 200;
+                    }
+                    else
+                    {
+                        x = startX;
+                        y = startY;
+                        lives--;
+                        if (lives == 0)
+                            gameFinished = true;
+                    }                
+                }
     }
 
 
@@ -397,6 +454,8 @@ public class SdlMuncher
             dots[i].visible = true;
 
         enemySpeed += 4;
+        enemies[0].visible = enemies[1].visible = enemies[2].visible =
+            enemies[3].visible = true;
     }
 
 
