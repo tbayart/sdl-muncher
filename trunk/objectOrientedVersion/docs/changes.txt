@@ -1,0 +1,4 @@
+Version OOP.001 - Game skeleton split into classes - it compiles, but does not display anything
+
+Version OOP.002 - Minimal working skeleton: player+enemy, credits, help, intro
+

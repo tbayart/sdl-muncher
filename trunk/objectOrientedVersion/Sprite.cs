@@ -1,37 +1,35 @@
-﻿//Angel Gonzalez
-
-using System;
-
-
-namespace GameSkeleton
+﻿namespace Game
 {
     class Sprite
     {
-        protected int x;
-        protected int y;
-        protected int speedX;
-        protected int speedY;
+        protected int x, y;
+        protected int xSpeed, ySpeed;
         protected bool visible;
         protected Image image;
 
         public Sprite()
         {
         }
-        
-        private void Move()
+
+        public void MoveTo( int newX, int newY)
         {
+            x = newX;
+            y = newY;
         }
 
-        private void Draw()
+        public void Move()
         {
+            // To be redefined in subclasses
         }
 
-        private void NextFrame()
+        public void LoadImage(string name)
         {
+            image = new Image(name);
         }
 
-        private void Restart()
+        public void DrawOnHiddenScreen()
         {
+            Hardware.DrawHiddenImage(image, x, y);
         }
     }
 }
