@@ -1,14 +1,17 @@
-﻿//Angel Gonzalez
-
-using System;
-
-
-namespace GameSkeleton
+﻿namespace Game
 {
-    class Player:Sprite
+    class Player : Sprite
     {
         public Player()
         {
+            LoadImage("data/pac01r.png");
+            MoveTo(200, 200);
+            xSpeed = 4;
+        }
+
+        public void MoveRight()
+        {
+            x += xSpeed;
         }
 
         private void MoveUp()
@@ -20,10 +23,6 @@ namespace GameSkeleton
         }
 
         private void MoveLeft()
-        {
-        }
-
-        private void MoveRight()
         {
         }
     }

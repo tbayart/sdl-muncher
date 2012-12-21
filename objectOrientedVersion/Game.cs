@@ -1,44 +1,60 @@
-﻿//Angel Gonzalez
+﻿using System;
 
-using System;
-
-
-namespace GameSkeleton
+namespace Game
 {
     class Game
     {
-
-        private Player player1;
-        private Enemy enemy1;
-        
-        public Game()
-        {
-            player1 = new Player();
-            enemy1 = new Enemy();
-        }
+        bool gameFinished;
+        Player pac;
+        Enemy ghost;
 
         public void Run()
         {
+            gameFinished = false;
+            pac = new Player();
+            ghost = new Enemy();
+            while (!gameFinished)
+            {
+                DrawElements();
+                CheckInputDevices();
+                MoveElements();
+                CheckCollisions();
+                PauseTillNextFrame();
+            } // end of game loop
         }
 
-        private void DrawElements()
+        public void DrawElements()
+        {
+            Hardware.ClearScreen();
+            pac.DrawOnHiddenScreen();
+            ghost.DrawOnHiddenScreen();
+            Hardware.ShowHiddenScreen();
+        }
+
+
+        public void CheckInputDevices()
+        {
+            if (Hardware.KeyPressed(Hardware.KEY_RIGHT))
+                pac.MoveRight();
+            if (Hardware.KeyPressed(Hardware.KEY_ESC))
+                gameFinished = true;
+        }
+
+
+        public void MoveElements()
+        {
+            ghost.Move();
+        }
+
+
+        public void CheckCollisions()
         {
         }
 
-        private void MoveElements()
-        {
-        }
 
-        private void CheckInputDevices()
+        public static void PauseTillNextFrame()
         {
-        }
-
-        private void CheckCollisions()
-        {
-        }
-
-        private void PauseTillFrame()
-        {
+            Hardware.Pause(40);
         }
     }
 }

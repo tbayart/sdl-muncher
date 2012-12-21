@@ -1,8 +1,4 @@
-﻿//Angel Gonzalez
-
-using System;
-
-namespace GameSkeleton
+﻿namespace Game
 {
     class Program
     {
@@ -10,6 +6,9 @@ namespace GameSkeleton
 
         public Program()
         {
+            bool fullScreen = false;
+            Hardware.Init(800, 600, 24, fullScreen);
+            
             intro = new Intro();
         }
 
@@ -23,7 +22,6 @@ namespace GameSkeleton
         {
             Program myGame = new Program();
             myGame.Run();
-
         }
     }
 }
