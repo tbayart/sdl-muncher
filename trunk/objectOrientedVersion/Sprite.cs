@@ -1,4 +1,17 @@
-﻿namespace Game
+﻿
+/**
+ * Sprite.cs - A basic graphic element to inherit from
+ * 
+ * Part of SdlMuncher - A PacMan clone using C# and SDL
+ * Nacho Cabanes, 2013
+ * 
+ * Changes:
+ * 0.01, 21-dec-2012: Empty skeleton
+ * 0.02, 21-dec-2012: Sprite can be loaded, moved to a new position and drawn
+ * 
+ */
+
+namespace Game
 {
     class Sprite
     {
@@ -17,7 +30,7 @@
             y = newY;
         }
 
-        public void Move()
+        public virtual void Move()
         {
             // To be redefined in subclasses
         }
