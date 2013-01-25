@@ -12,6 +12,8 @@
  *     enemy moves on its own
  * 0.03, 18-jan-2013
  *     Player can move in 4 directions, level is drawn
+ * 0.04, 25-ene-2013
+ *     Basic collisions checking
  */
 
 namespace Game
@@ -72,6 +74,8 @@ namespace Game
 
         public void CheckCollisions()
         {
+            if (pac.CollisionsWith(ghost))
+                gameFinished = true;
         }
 
 
