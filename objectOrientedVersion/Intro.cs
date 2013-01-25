@@ -1,4 +1,16 @@
-﻿namespace Game
+﻿/**
+ * Intro.cs - Welcome screen and main menu
+ * 
+ * Part of SdlMuncher - A PacMan clone using C# and SDL
+ * Nacho Cabanes, 2013
+ * 
+ * Changes:
+ * 0.01, 21-dec-2012: Empty skeleton
+ * 0.02, 21-dec-2012: User can enter the Help Screen, Credits screen or a Game
+ * 
+ */
+
+namespace Game
 {
     class Intro
     {

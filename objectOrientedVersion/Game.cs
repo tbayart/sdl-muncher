@@ -1,4 +1,18 @@
-﻿using System;
+﻿/**
+ * Game.cs - Game logic
+ * 
+ * Part of SdlMuncher - A PacMan clone using C# and SDL
+ * Nacho Cabanes, 2013
+ * 
+ * Changes:
+ * 0.01, 21-dec-2012
+ *     Empty skeleton
+ * 0.02, 21-dec-2012 
+ *     Basic game loop, player can move to the right, 
+ *     enemy moves on its own
+ * 0.03, 18-jan-2013
+ *     Player can move in 4 directions, level is drawn
+ */
 
 namespace Game
 {
@@ -7,12 +21,14 @@ namespace Game
         bool gameFinished;
         Player pac;
         Enemy ghost;
+        Level level;
 
         public void Run()
         {
             gameFinished = false;
             pac = new Player();
             ghost = new Enemy();
+            level = new Level();
             while (!gameFinished)
             {
                 DrawElements();
@@ -26,6 +42,7 @@ namespace Game
         public void DrawElements()
         {
             Hardware.ClearScreen();
+            level.DrawOnHiddenScreen();
             pac.DrawOnHiddenScreen();
             ghost.DrawOnHiddenScreen();
             Hardware.ShowHiddenScreen();
@@ -36,6 +53,12 @@ namespace Game
         {
             if (Hardware.KeyPressed(Hardware.KEY_RIGHT))
                 pac.MoveRight();
+            if (Hardware.KeyPressed(Hardware.KEY_LEFT))
+                pac.MoveLeft();
+            if (Hardware.KeyPressed(Hardware.KEY_DOWN))
+                pac.MoveDown();
+            if (Hardware.KeyPressed(Hardware.KEY_UP))
+                pac.MoveUp();
             if (Hardware.KeyPressed(Hardware.KEY_ESC))
                 gameFinished = true;
         }

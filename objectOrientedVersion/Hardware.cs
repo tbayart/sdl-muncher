@@ -1,4 +1,16 @@
-﻿using System.IO;
+﻿/**
+ * Hardware.cs - Hides SDL library
+ * 
+ * Part of SdlMuncher - A PacMan clone using C# and SDL
+ * Nacho Cabanes, 2013
+ * 
+ * Changes:
+ * 0.01, 21-dec-2012: Empty skeleton
+ * 0.02, 21-dec-2012
+ *     Basic functions: init, clear, draw images, write text, fatal error
+ * 
+ */
+using System.IO;
 using System.Threading;
 using Tao.Sdl;
 using System;

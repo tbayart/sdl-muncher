@@ -55,8 +55,14 @@
     <Compile Include="..\Help.cs" />
     <Compile Include="..\Image.cs" />
     <Compile Include="..\Intro.cs" />
+    <Compile Include="..\Level.cs">
+      <Link>Level.cs</Link>
+    </Compile>
     <Compile Include="..\Player.cs" />
     <Compile Include="..\Program.cs" />
+    <Compile Include="..\Sound.cs">
+      <Link>Sound.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\Sprite.cs" />
   </ItemGroup>

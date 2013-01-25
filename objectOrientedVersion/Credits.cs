@@ -1,4 +1,17 @@
-﻿namespace Game
+﻿
+/**
+ * Credits.cs - Credits screen
+ * 
+ * Part of SdlMuncher - A PacMan clone using C# and SDL
+ * Nacho Cabanes, 2013
+ * 
+ * Changes:
+ * 0.01, 21-dec-2012: Empty skeleton
+ * 0.02, 21-dec-2012: Basic credits screen, showing static text
+ * 
+ */
+
+namespace Game
 {
     class Credits
     {
