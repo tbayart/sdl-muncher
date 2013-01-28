@@ -7,7 +7,7 @@
  * Changes:
  * 0.01, 21-dec-2012: Empty skeleton
  * 0.02, 21-dec-2012: User can enter the Help Screen, Credits screen or a Game
- * 
+ * 0.05, 28-jan-2013: Animation (pac+ghost)
  */
 
 namespace Game
@@ -18,6 +18,9 @@ namespace Game
         {
             Font sans18 = new Font("data/Joystix.ttf", 18);
             Image background = new Image("data/background.png");
+            int x = -40;
+            Player myPlayer = new Player();
+            Enemy myGhost = new Enemy();
 
             do
             {
@@ -41,9 +44,21 @@ namespace Game
                     340, 520,
                     0x66, 0x66, 0x66,
                     sans18);
+
+                myGhost.MoveTo(x-50, 300);
+                myGhost.NextFrame();
+                myGhost.DrawOnHiddenScreen();
+                myPlayer.MoveTo(x, 300);
+                myPlayer.NextFrame();
+                myPlayer.DrawOnHiddenScreen();
+
+                x += 8;
+                if (x > 850) 
+                    x = -40;
+                
                 Hardware.ShowHiddenScreen();
 
-                Hardware.Pause(20);
+                Hardware.Pause(40);
 
                 if (Hardware.KeyPressed(Hardware.KEY_C))
                 {

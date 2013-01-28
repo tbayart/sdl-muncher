@@ -14,6 +14,9 @@
  *     Player can move in 4 directions, level is drawn
  * 0.04, 25-ene-2013
  *     Basic collisions checking
+ * 0.05, 28-jan-2013
+ *     Player checks if it is a valid position before moving
+ *     If the position is valid, he gets points
  */
 
 namespace Game
@@ -24,13 +27,16 @@ namespace Game
         Player pac;
         Enemy ghost;
         Level level;
+        int score;
 
         public void Run()
         {
             gameFinished = false;
             pac = new Player();
+            pac.MoveTo(8 * 32, 6 * 32);
             ghost = new Enemy();
             level = new Level();
+            score = 0;
             while (!gameFinished)
             {
                 DrawElements();
@@ -53,14 +59,42 @@ namespace Game
 
         public void CheckInputDevices()
         {
-            if (Hardware.KeyPressed(Hardware.KEY_RIGHT))
+            if (Hardware.KeyPressed(Hardware.KEY_RIGHT)
+                    && level.CanMoveTo(pac.GetX() + pac.GetSpeedX(), pac.GetY(),
+                    pac.GetX() + pac.GetWidth() + pac.GetSpeedX(), pac.GetY() + pac.GetHeight()))
+            {
                 pac.MoveRight();
-            if (Hardware.KeyPressed(Hardware.KEY_LEFT))
+                score += level.GetPointsFrom(pac.GetX() + pac.GetSpeedX(), pac.GetY(),
+                    pac.GetX() + pac.GetWidth() + pac.GetSpeedX(), pac.GetY() + pac.GetHeight());
+            }
+
+            if (Hardware.KeyPressed(Hardware.KEY_LEFT)
+                    && level.CanMoveTo(pac.GetX() - pac.GetSpeedX(), pac.GetY(),
+                    pac.GetX() + pac.GetWidth() - pac.GetSpeedX(), pac.GetY() + pac.GetHeight()))
+            {
                 pac.MoveLeft();
-            if (Hardware.KeyPressed(Hardware.KEY_DOWN))
+                score += level.GetPointsFrom(pac.GetX() - pac.GetSpeedX(), pac.GetY(),
+                    pac.GetX() + pac.GetWidth() - pac.GetSpeedX(), pac.GetY() + pac.GetHeight());
+            }
+
+            if (Hardware.KeyPressed(Hardware.KEY_DOWN)
+                    && level.CanMoveTo(pac.GetX(), pac.GetY() + pac.GetSpeedY(),
+                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() + pac.GetSpeedY()))
+            {
                 pac.MoveDown();
-            if (Hardware.KeyPressed(Hardware.KEY_UP))
+                score += level.GetPointsFrom(pac.GetX(), pac.GetY() + pac.GetSpeedY(),
+                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() + pac.GetSpeedY());
+            }
+
+            if (Hardware.KeyPressed(Hardware.KEY_UP)
+                    && level.CanMoveTo(pac.GetX(), pac.GetY() - pac.GetSpeedY(),
+                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() - pac.GetSpeedY()))
+            {
                 pac.MoveUp();
+                score += level.GetPointsFrom(pac.GetX(), pac.GetY() - pac.GetSpeedY(),
+                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() - pac.GetSpeedY());
+            }
+
             if (Hardware.KeyPressed(Hardware.KEY_ESC))
                 gameFinished = true;
         }
