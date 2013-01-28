@@ -12,6 +12,7 @@
  *     Support for collisions between sprites
  *     Support for sequences (animated images): array of images,
  *     new constructor, LoadSequence method
+ * 0.05, 28-jan-2013: Support for collisions with coordinates
  */
 
 namespace Game
@@ -82,6 +83,16 @@ namespace Game
             return height;
         }
 
+        public int GetSpeedX()
+        {
+            return xSpeed;
+        }
+
+        public int GetSpeedY()
+        {
+            return ySpeed;
+        }
+
         public bool IsVisible()
         {
             return visible;
@@ -124,6 +135,19 @@ namespace Game
                 return true;
             return false;
         }
+
+        public bool CollisionsWith(int xStart, int yStart, int xEnd, int yEnd)
+        {
+            if (visible && 
+                    (x < xEnd) &&    
+                    (x + width > xStart) &&
+                    (y < yEnd) &&    
+                    (y + height > yStart)
+                    )
+                return true;
+            return false;
+        }
+
 
     }
 }
