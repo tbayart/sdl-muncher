@@ -17,6 +17,9 @@
  * 0.05, 28-jan-2013
  *     Player checks if it is a valid position before moving
  *     If the position is valid, he gets points
+ * 0.08, 06-feb-2013: 
+ *     Current level is passed to the Enemy, so that it checks collision
+ *     Keys T+L simultaneously allow advancing a level (Trick: Level)
  */
 
 namespace Game
@@ -34,8 +37,8 @@ namespace Game
             gameFinished = false;
             pac = new Player();
             pac.MoveTo(8 * 32, 6 * 32);
-            ghost = new Enemy();
             level = new Level();
+            ghost = new Enemy(level);
             score = 0;
             while (!gameFinished)
             {
@@ -94,6 +97,9 @@ namespace Game
                 score += level.GetPointsFrom(pac.GetX(), pac.GetY() - pac.GetSpeedY(),
                     pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() - pac.GetSpeedY());
             }
+
+            if (Hardware.KeyPressed(Hardware.KEY_T) && Hardware.KeyPressed(Hardware.KEY_L))
+                level.Advance();
 
             if (Hardware.KeyPressed(Hardware.KEY_ESC))
                 gameFinished = true;

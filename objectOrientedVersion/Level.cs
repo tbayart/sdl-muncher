@@ -12,40 +12,91 @@
  *     Dots are also drawn
  * 0.05, 28-jan-2013
  *     CanMoveTo(), private IsCollision()
+ * 0.08, 06-feb-2013: 
+ *     The current level can be finished and advanced
  */
 
 namespace Game
 {
     class Level
     {
-        static string[] map = 
+        static string[] map; 
+
+        static string[,] availableMaps = 
         {
-            "-----------------",
-            "-.......-.......-",
-            "-.--.--.-.--.--.-",
-            "-...............-",
-            "-.--.-.---.-.--.-",
-            "-....-..-..-....-",
-            "----.--...--.----",
-            ".................",
-            "----.-.-.-.-.----",
-            "-....-.-.-.-....-",
-            "-.--.-.---.-.--.-",
-            "-...............-",
-            "-.--.-.---.-.--.-",
-            "-....-.....-....-",
-            "-----------------"
+            {
+                "-----------------",
+                "-.......-.......-",
+                "-.--.--.-.--.--.-",
+                "-...............-",
+                "-.--.-.---.-.--.-",
+                "-....-..-..-....-",
+                "----.--...--.----",
+                ".................",
+                "----.-.-.-.-.----",
+                "-....-.-.-.-....-",
+                "-.--.-.---.-.--.-",
+                "-...............-",
+                "-.--.-.---.-.--.-",
+                "-....-.....-....-",
+                "-----------------"
+            },
+            {
+                "-----------------",
+                "-...............-",
+                "-.--.-------.--.-",
+                "-...............-",
+                "-.--.-.---.-.--.-",
+                "-....-..-..-....-",
+                "----.--...--.----",
+                ".................",
+                "----.-.-.-.-.----",
+                "-....-.-.-.-....-",
+                "-.--.-.---.-.--.-",
+                "-...............-",
+                "-.--.-.---.-.--.-",
+                "-....-.....-....-",
+                "-----------------"
+            }
         };
 
         Image rockImage;
         Image dotImage;
         int tileWidth = 32;
         int tileHeight = 32;
+        int currentMapNumber = 0;
+        int amountOfMaps = 2;
+        int rowsPerMap = 15;
+        int remainingDots = 0;
 
         public Level()
         {
             rockImage = new Image("data/wall.png");
             dotImage = new Image("data/dot.png");
+            
+            map = new string[rowsPerMap];
+            Prepare(0); // Prepare map for first level
+        }
+
+        public void Prepare(int levelNumber)
+        {
+            remainingDots = 0;
+            for (int i = 0; i < rowsPerMap; i++)
+            {
+                map[i] = availableMaps[currentMapNumber, i];
+                for (int j = 0; j < map[i].Length; j++)
+                    if (map[i][j] == '.')
+                        remainingDots++;
+            }
+        }
+
+        public void Advance()
+        {
+            if (currentMapNumber < amountOfMaps - 1)
+                currentMapNumber++;
+            else
+                currentMapNumber = 0;
+            Prepare(currentMapNumber);
         }
 
         public void DrawOnHiddenScreen()
@@ -110,8 +161,14 @@ namespace Game
                              column * tileWidth, row * tileHeight,
                              (column + 1) * tileWidth, (row + 1) * tileHeight))
                     {
+                        // We remove the dot
                         map[row] = map[row].Remove(column, 1);
                         map[row] = map[row].Insert(column, " ");
+                        // We check if we must advance a level
+                        remainingDots--;
+                        if (remainingDots == 0)
+                            Advance();
+                        // And we return the points
                         return 10;
                     }
                 }
