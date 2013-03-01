@@ -11,7 +11,7 @@
  * 0.04, 25-ene-2013: Animated when moving (two images)
  * 0.07, 05-feb-2013: 
  *   Two images in each direction
- *   MoveRight and so on can deb used to change the direction
+ *   MoveRight and so on can be used to change the direction
  */
 
 namespace Game

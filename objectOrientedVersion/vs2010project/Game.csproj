@@ -49,6 +49,18 @@
   <ItemGroup>
     <Compile Include="..\Credits.cs" />
     <Compile Include="..\Enemy.cs" />
+    <Compile Include="..\EnemyBlue.cs">
+      <Link>EnemyBlue.cs</Link>
+    </Compile>
+    <Compile Include="..\EnemyGreen.cs">
+      <Link>EnemyGreen.cs</Link>
+    </Compile>
+    <Compile Include="..\EnemyPurple.cs">
+      <Link>EnemyPurple.cs</Link>
+    </Compile>
+    <Compile Include="..\EnemyRed.cs">
+      <Link>EnemyRed.cs</Link>
+    </Compile>
     <Compile Include="..\Font.cs" />
     <Compile Include="..\Game.cs" />
     <Compile Include="..\Hardware.cs" />
@@ -60,6 +72,9 @@
     </Compile>
     <Compile Include="..\Player.cs" />
     <Compile Include="..\Program.cs" />
+    <Compile Include="..\ScoreBoard.cs">
+      <Link>ScoreBoard.cs</Link>
+    </Compile>
     <Compile Include="..\Sound.cs">
       <Link>Sound.cs</Link>
     </Compile>

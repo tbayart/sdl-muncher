@@ -20,16 +20,21 @@
  * 0.08, 06-feb-2013: 
  *     Current level is passed to the Enemy, so that it checks collision
  *     Keys T+L simultaneously allow advancing a level (Trick: Level)
+ * 0.09, 01-mar-2013: 
+ *     Four ghosts
  */
 
 namespace Game
 {
     class Game
     {
+        const int NUM_ENEMIES = 4;
+
         bool gameFinished;
         Player pac;
-        Enemy ghost;
+        Enemy[] ghosts;
         Level level;
+        ScoreBoard scoreBoard;
         int score;
 
         public void Run()
@@ -38,7 +43,12 @@ namespace Game
             pac = new Player();
             pac.MoveTo(8 * 32, 6 * 32);
             level = new Level();
-            ghost = new Enemy(level);
+            ghosts = new Enemy[NUM_ENEMIES];
+            ghosts[0] = new EnemyGreen(level);
+            ghosts[1] = new EnemyRed(level);
+            ghosts[2] = new EnemyBlue(level);
+            ghosts[3] = new EnemyPurple(level);
+            scoreBoard = new ScoreBoard();
             score = 0;
             while (!gameFinished)
             {
@@ -55,7 +65,9 @@ namespace Game
             Hardware.ClearScreen();
             level.DrawOnHiddenScreen();
             pac.DrawOnHiddenScreen();
-            ghost.DrawOnHiddenScreen();
+            for (int i=0; i<NUM_ENEMIES; i++)
+                ghosts[i].DrawOnHiddenScreen();
+            scoreBoard.DrawOnHiddenScreen();
             Hardware.ShowHiddenScreen();
         }
 
@@ -108,14 +120,17 @@ namespace Game
 
         public void MoveElements()
         {
-            ghost.Move();
+            for (int i = 0; i < NUM_ENEMIES; i++)
+                ghosts[i].Move();
+            scoreBoard.SetScore(score);
         }
 
 
         public void CheckCollisions()
         {
-            if (pac.CollisionsWith(ghost))
-                gameFinished = true;
+            for (int i=0; i<NUM_ENEMIES; i++)
+                if (pac.CollisionsWith(ghosts[i]))
+                    gameFinished = true;
         }
 
 
