@@ -14,6 +14,8 @@
  *     CanMoveTo(), private IsCollision()
  * 0.08, 06-feb-2013: 
  *     The current level can be finished and advanced
+ * 0.09, 01-mar-2013: 
+ *     Big dots
  */
 
 namespace Game
@@ -27,7 +29,7 @@ namespace Game
             {
                 "-----------------",
                 "-.......-.......-",
-                "-.--.--.-.--.--.-",
+                "-o--.--.-.--.--o-",
                 "-...............-",
                 "-.--.-.---.-.--.-",
                 "-....-..-..-....-",
@@ -37,7 +39,7 @@ namespace Game
                 "-....-.-.-.-....-",
                 "-.--.-.---.-.--.-",
                 "-...............-",
-                "-.--.-.---.-.--.-",
+                "-o--.-.---.-.--o-",
                 "-....-.....-....-",
                 "-----------------"
             },
@@ -62,6 +64,7 @@ namespace Game
 
         Image rockImage;
         Image dotImage;
+        Image bigDotImage;
         int tileWidth = 32;
         int tileHeight = 32;
         int currentMapNumber = 0;
@@ -73,6 +76,7 @@ namespace Game
         {
             rockImage = new Image("data/wall.png");
             dotImage = new Image("data/dot.png");
+            bigDotImage = new Image("data/bigDot.png");
             
             map = new string[rowsPerMap];
             Prepare(0); // Prepare map for first level
@@ -85,7 +89,7 @@ namespace Game
             {
                 map[i] = availableMaps[currentMapNumber, i];
                 for (int j = 0; j < map[i].Length; j++)
-                    if (map[i][j] == '.')
+                    if ((map[i][j] == '.') || (map[i][j] == 'o'))
                         remainingDots++;
             }
         }
@@ -110,6 +114,8 @@ namespace Game
                         Hardware.DrawHiddenImage(rockImage, column * tileWidth, row * tileHeight);
                     if (map[row][column] == '.')
                         Hardware.DrawHiddenImage(dotImage, column * tileWidth, row * tileHeight);
+                    if (map[row][column] == 'o')
+                        Hardware.DrawHiddenImage(bigDotImage, column * tileWidth, row * tileHeight);
                 }
             }
         }
@@ -156,11 +162,13 @@ namespace Game
             {
                 for (int column = 0; column < 17; column++)
                 {
-                    if ((map[row][column] == '.')
+                    if ( ((map[row][column] == '.') || (map[row][column] == 'o'))
                         && IsCollision(xStart, yStart, xEnd, yEnd,
                              column * tileWidth, row * tileHeight,
                              (column + 1) * tileWidth, (row + 1) * tileHeight))
                     {
+                        // We prepare the score to be returned
+                        int points = (map[row][column] == '.') ? 10 : 50;
                         // We remove the dot
                         map[row] = map[row].Remove(column, 1);
                         map[row] = map[row].Insert(column, " ");
@@ -169,7 +177,7 @@ namespace Game
                         if (remainingDots == 0)
                             Advance();
                         // And we return the points
-                        return 10;
+                        return points;
                     }
                 }
             }
