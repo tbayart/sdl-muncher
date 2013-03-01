@@ -8,7 +8,8 @@
  * 0.01, 21-dec-2012: Empty skeleton
  * 0.02, 21-dec-2012
  *     Basic functions: init, clear, draw images, write text, fatal error
- * 
+ * 0.10, 01-mar-2013: 
+ *     Basic support for scrolling
  */
 using System.IO;
 using System.Threading;
@@ -21,6 +22,8 @@ namespace Game
     {
         static IntPtr hiddenScreen;
         static short width, height;
+
+        static short startX, startY; // For Scroll
 
 
         public static void Init(short w, short h, int colors, bool fullScreen)
@@ -53,7 +56,7 @@ namespace Game
 
         public static void DrawHiddenImage(Image image, int x, int y)
         {
-            drawHiddenImage(image.GetPointer(), x, y);
+            drawHiddenImage(image.GetPointer(), x + startX, y + startY);
         }
 
         public static void ShowHiddenScreen()
@@ -108,10 +111,35 @@ namespace Game
                 Environment.Exit(5);
 
             Sdl.SDL_Rect origen = new Sdl.SDL_Rect(0, 0, width, height);
-            Sdl.SDL_Rect dest = new Sdl.SDL_Rect(x, y, width, height);
+            Sdl.SDL_Rect dest = new Sdl.SDL_Rect(
+                (short) (x + startX), (short) (y + startY),
+                width, height);
 
             Sdl.SDL_BlitSurface(textoComoImagen, ref origen,
               hiddenScreen, ref dest);
+        }
+
+        // Scroll Methods
+
+        public static void ResetScroll()
+        {
+            startX = startY = 0;
+        }
+
+        public static void ScrollTo(short newStartX, short newStartY)
+        {
+            startX = newStartX;
+            startY = newStartY;
+        }
+
+        public static void ScrollHorizontally(short xDespl)
+        {
+            startX += xDespl;
+        }
+
+        public static void ScrollVertically(short yDespl)
+        {
+            startY += yDespl;
         }
 
 
@@ -124,6 +152,7 @@ namespace Game
               width, height);
             Sdl.SDL_BlitSurface(image, ref origin, hiddenScreen, ref dest);
         }
+
 
         // Alternate key definitions
 
