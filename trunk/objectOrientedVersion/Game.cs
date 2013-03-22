@@ -22,6 +22,8 @@
  *     Keys T+L simultaneously allow advancing a level (Trick: Level)
  * 0.09, 01-mar-2013: 
  *     Four ghosts
+ * 0.11, 22-mar-2013: 
+ *     Ghosts can become grey ("eatable")
  */
 
 namespace Game
@@ -79,8 +81,6 @@ namespace Game
                     pac.GetX() + pac.GetWidth() + pac.GetSpeedX(), pac.GetY() + pac.GetHeight()))
             {
                 pac.MoveRight();
-                score += level.GetPointsFrom(pac.GetX() + pac.GetSpeedX(), pac.GetY(),
-                    pac.GetX() + pac.GetWidth() + pac.GetSpeedX(), pac.GetY() + pac.GetHeight());
             }
 
             if (Hardware.KeyPressed(Hardware.KEY_LEFT)
@@ -88,8 +88,6 @@ namespace Game
                     pac.GetX() + pac.GetWidth() - pac.GetSpeedX(), pac.GetY() + pac.GetHeight()))
             {
                 pac.MoveLeft();
-                score += level.GetPointsFrom(pac.GetX() - pac.GetSpeedX(), pac.GetY(),
-                    pac.GetX() + pac.GetWidth() - pac.GetSpeedX(), pac.GetY() + pac.GetHeight());
             }
 
             if (Hardware.KeyPressed(Hardware.KEY_DOWN)
@@ -97,8 +95,6 @@ namespace Game
                     pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() + pac.GetSpeedY()))
             {
                 pac.MoveDown();
-                score += level.GetPointsFrom(pac.GetX(), pac.GetY() + pac.GetSpeedY(),
-                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() + pac.GetSpeedY());
             }
 
             if (Hardware.KeyPressed(Hardware.KEY_UP)
@@ -106,8 +102,6 @@ namespace Game
                     pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() - pac.GetSpeedY()))
             {
                 pac.MoveUp();
-                score += level.GetPointsFrom(pac.GetX(), pac.GetY() - pac.GetSpeedY(),
-                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() - pac.GetSpeedY());
             }
 
             if (Hardware.KeyPressed(Hardware.KEY_T) && Hardware.KeyPressed(Hardware.KEY_L))
@@ -128,9 +122,23 @@ namespace Game
 
         public void CheckCollisions()
         {
+            // First, collisions with dots
+            int currentPoints = level.GetPointsFrom(pac.GetX(), pac.GetY(),
+                    pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight());            
+            score += currentPoints;
+            if (currentPoints == 50)  // If big dot eaten
+                for (int i = 0; i < NUM_ENEMIES; i++)  // Ghosts must turn grey
+                    ghosts[i].BecomeGrey();
+
+            // Then, with enemies
             for (int i=0; i<NUM_ENEMIES; i++)
                 if (pac.CollisionsWith(ghosts[i]))
-                    gameFinished = true;
+                {
+                    if (ghosts[i].IsGrey())
+                        ghosts[i].Hide();
+                    else
+                        gameFinished = true;
+                }
         }
 
 

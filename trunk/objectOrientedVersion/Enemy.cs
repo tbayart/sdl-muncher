@@ -13,6 +13,8 @@
  *     Image changes after n passes (10 as starting value)
  * 0.08, 06-feb-2013: 
  *     "Move" checks valid positions in the current level
+ * 0.11, 22-mar-2013: 
+ *     Ghosts can become grey ("eatable")
  */
 
 using System;
@@ -26,6 +28,9 @@ namespace Game
         protected Level myLevel;        // The level in which the ghost is, to check collisions
         protected Random randomGenerator;
         protected int baseEnemySpeed;
+        protected Image greyImage;      // Image when the ghost can be eaten
+        protected bool isGrey;          // Can the ghost be eaten?
+        protected int greyTime;         // Remaining time during which can be eaten
 
         public Enemy()
         {
@@ -36,6 +41,9 @@ namespace Game
             frameWaitCounter = 0;
             randomGenerator = new Random();
             baseEnemySpeed = 2;
+            greyImage = new Image("data/ghostGrey.png");
+            isGrey = false;
+            greyTime = 200;
         }
 
         public Enemy(Level l): this()
@@ -47,6 +55,15 @@ namespace Game
         {
             if (myLevel == null)  // If no level has been indicated, it will not move
                 return;
+
+            // Decrease ghost chasing time
+	        if (isGrey)
+	            greyTime --;
+            if (greyTime <= 0)
+	        {
+                greyTime = 200;
+                BecomeNormal();
+	        }
 
             // Move through the labyrinth
             if (myLevel.CanMoveTo(x + xSpeed, y + ySpeed, 
@@ -85,6 +102,24 @@ namespace Game
                 NextFrame();
                 frameWaitCounter = 0;
             }
+        }
+
+        public void BecomeGrey()
+        {
+            isGrey = true;
+            containsSequence = false;
+            image = greyImage;
+        }
+
+        public void BecomeNormal()
+        {
+            isGrey = false;
+            containsSequence = true; ;
+        }
+
+        public bool IsGrey()
+        {
+            return isGrey;
         }
 
     }
