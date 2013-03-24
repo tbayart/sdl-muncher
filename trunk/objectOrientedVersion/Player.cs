@@ -12,21 +12,26 @@
  * 0.07, 05-feb-2013: 
  *   Two images in each direction
  *   MoveRight and so on can be used to change the direction
+ * 0.12, 23-mar-2013: 
+ *     Three lives. Position can be restarted.
  */
 
 namespace Game
 {
     class Player : Sprite
     {
+        int lives;
+
         public Player()
         {
             LoadSequence(RIGHT, new string[] { "data/pac01r.png", "data/pac02r.png" });
             LoadSequence(LEFT, new string[] { "data/pac01l.png", "data/pac02l.png" });
             LoadSequence(UP, new string[] { "data/pac01u.png", "data/pac02u.png" });
             LoadSequence(DOWN, new string[] { "data/pac01d.png", "data/pac02d.png" });
-            MoveTo(200, 200);
+            //MoveTo(200, 200);
             xSpeed = 4;
             ySpeed = 4;
+            lives = 3;
         }
 
         public void MoveRight()
@@ -55,6 +60,17 @@ namespace Game
             ChangeDirection(DOWN);
             y += ySpeed;
             NextFrame();
+        }
+
+        public void LoseLive()
+        {
+            lives--;
+            Restart();
+        }
+
+        public int GetLives()
+        {
+            return lives;
         }
 
     }

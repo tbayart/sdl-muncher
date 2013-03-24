@@ -17,6 +17,8 @@
  *     Support for sequences in multiple directions
  *     Improved collisions checking
  *     Only draws if visible (+Show, Hide)
+ * 0.12, 23-mar-2013: 
+ *     Position can be restarted.
  */
 
 namespace Game
@@ -24,6 +26,7 @@ namespace Game
     class Sprite
     {
         protected int x, y;
+        protected int startX, startY;
         protected int width, height;
         protected int xSpeed, ySpeed;
         protected bool visible;
@@ -48,6 +51,8 @@ namespace Game
 
         public Sprite()
         {
+            startX = -1;
+            startY = -1;
             width = 32;
             height = 32;
             visible = true;
@@ -127,6 +132,11 @@ namespace Game
         {
             x = newX;
             y = newY;
+            if (startX == -1)
+            {
+                startX = x;
+                startY = y;
+            }
         }
 
         public void Show()
@@ -193,6 +203,12 @@ namespace Game
                     )
                 return true;
             return false;
+        }
+
+        public void Restart()
+        {
+            x = startX;
+            y = startY;
         }
 
 

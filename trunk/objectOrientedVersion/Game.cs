@@ -24,6 +24,8 @@
  *     Four ghosts
  * 0.11, 22-mar-2013: 
  *     Ghosts can become grey ("eatable")
+ * 0.12, 23-mar-2013: 
+ *     Three lives. Map is centered on screen
  */
 
 namespace Game
@@ -41,6 +43,7 @@ namespace Game
 
         public void Run()
         {
+            Hardware.ScrollTo(100, 35);
             gameFinished = false;
             pac = new Player();
             pac.MoveTo(8 * 32, 6 * 32);
@@ -60,6 +63,7 @@ namespace Game
                 CheckCollisions();
                 PauseTillNextFrame();
             } // end of game loop
+            Hardware.ScrollTo(0, 0);
         }
 
         public void DrawElements()
@@ -137,7 +141,12 @@ namespace Game
                     if (ghosts[i].IsGrey())
                         ghosts[i].Hide();
                     else
-                        gameFinished = true;
+                    {
+                        pac.LoseLive();
+                        scoreBoard.SetLives(pac.GetLives());
+                        if (pac.GetLives() == 0)
+                            gameFinished = true;
+                    }
                 }
         }
 
