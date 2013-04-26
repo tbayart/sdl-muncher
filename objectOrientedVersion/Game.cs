@@ -26,6 +26,8 @@
  *     Ghosts can become grey ("eatable")
  * 0.12, 23-mar-2013: 
  *     Three lives. Map is centered on screen
+ * 0.13, 26-apr-2013: 
+ *     Joystick/gamepad support
  */
 
 namespace Game
@@ -80,28 +82,28 @@ namespace Game
 
         public void CheckInputDevices()
         {
-            if (Hardware.KeyPressed(Hardware.KEY_RIGHT)
+            if ((Hardware.KeyPressed(Hardware.KEY_RIGHT) || Hardware.JoystickMovedRight())
                     && level.CanMoveTo(pac.GetX() + pac.GetSpeedX(), pac.GetY(),
                     pac.GetX() + pac.GetWidth() + pac.GetSpeedX(), pac.GetY() + pac.GetHeight()))
             {
                 pac.MoveRight();
             }
 
-            if (Hardware.KeyPressed(Hardware.KEY_LEFT)
+            if ((Hardware.KeyPressed(Hardware.KEY_LEFT) || Hardware.JoystickMovedLeft())
                     && level.CanMoveTo(pac.GetX() - pac.GetSpeedX(), pac.GetY(),
                     pac.GetX() + pac.GetWidth() - pac.GetSpeedX(), pac.GetY() + pac.GetHeight()))
             {
                 pac.MoveLeft();
             }
 
-            if (Hardware.KeyPressed(Hardware.KEY_DOWN)
+            if ((Hardware.KeyPressed(Hardware.KEY_DOWN) || Hardware.JoystickMovedDown())
                     && level.CanMoveTo(pac.GetX(), pac.GetY() + pac.GetSpeedY(),
                     pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() + pac.GetSpeedY()))
             {
                 pac.MoveDown();
             }
 
-            if (Hardware.KeyPressed(Hardware.KEY_UP)
+            if ((Hardware.KeyPressed(Hardware.KEY_UP) || Hardware.JoystickMovedUp())
                     && level.CanMoveTo(pac.GetX(), pac.GetY() - pac.GetSpeedY(),
                     pac.GetX() + pac.GetWidth(), pac.GetY() + pac.GetHeight() - pac.GetSpeedY()))
             {
