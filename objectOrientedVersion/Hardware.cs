@@ -12,6 +12,8 @@
  *     Basic support for scrolling
  * 0.13, 26-apr-2013: 
  *     Joystick/gamepad support
+ * 0.14, 26-apr-2013: 
+ *     Mouse support
  */
 using System.IO;
 using System.Threading;
@@ -29,6 +31,9 @@ namespace Game
 
         static bool isThereJoystick;
         static IntPtr joystick;
+
+        static int mouseClickLapse;
+        static int lastMouseClick;
 
 
         public static void Init(short w, short h, int colors, bool fullScreen)
@@ -63,7 +68,11 @@ namespace Game
                 if (joystick == IntPtr.Zero)
                     isThereJoystick = false;
             }
-        
+
+            // Time lapse between two consecutive mouse clicks,
+            // so that they are not too near
+            mouseClickLapse = 10;
+            lastMouseClick  = Sdl.SDL_GetTicks();
         }
 
         public static void ClearScreen()
@@ -162,10 +171,10 @@ namespace Game
 
         // Joystick methods
 
-        /** JoyPulsado: devuelve TRUE si
-     *  ha sido pulsado un botón del jostick
-     *  (cualquiera, por ahora)
-     */
+        /** JoystickPressed: returns TRUE if
+         *  a certain button in the joystick/gamepad
+         *  has been pressed
+         */
         public static bool JoystickPressed(int boton)
         {
             if (!isThereJoystick)
@@ -177,8 +186,12 @@ namespace Game
                 return false;
         }
 
-        /** ratonPulsado: devuelve TRUE si
-         *  ha sido pulsado un botón del ratón
+        /** JoystickMoved: returns TRUE if
+         *  the joystick/gamepad has been moved
+         *  up to the limit in any direction
+         *  Then, int returns the corresponding
+         *  X (1=right, -1=left)
+         *  and Y (1=down, -1=up)
          */
         public static bool JoystickMoved(out int posX, out int posY)
         {
@@ -203,6 +216,10 @@ namespace Game
         }
 
 
+        /** JoystickMovedRight: returns TRUE if
+         *  the joystick/gamepad has been moved
+         *  completely to the right
+         */
         public static bool JoystickMovedRight()
         {            
             if (!isThereJoystick)
@@ -215,6 +232,10 @@ namespace Game
                 return false;
         }
 
+        /** JoystickMovedLeft: returns TRUE if
+         *  the joystick/gamepad has been moved
+         *  completely to the left
+         */
         public static bool JoystickMovedLeft()
         {
             if (!isThereJoystick)
@@ -227,6 +248,11 @@ namespace Game
                 return false;
         }
 
+
+        /** JoystickMovedUp: returns TRUE if
+         *  the joystick/gamepad has been moved
+         *  completely upwards
+         */
         public static bool JoystickMovedUp()
         {
             if (!isThereJoystick)
@@ -239,6 +265,11 @@ namespace Game
                 return false;
         }
 
+
+        /** JoystickMovedDown: returns TRUE if
+         *  the joystick/gamepad has been moved
+         *  completely downwards
+         */
         public static bool JoystickMovedDown()
         {
             if (!isThereJoystick)
@@ -247,6 +278,55 @@ namespace Game
             int posX = 0, posY = 0;
             if (JoystickMoved(out posX, out posY) && (posY == 1))
                 return true;
+            else
+                return false;
+        }
+
+
+        /** GetMouseX: returns the current X
+         *  coordinate of the mouse position
+         */
+        public static int GetMouseX()
+        {
+            int posX = 0, posY = 0;
+            Sdl.SDL_PumpEvents();
+            Sdl.SDL_GetMouseState(out posX, out posY);
+            return posX;
+        }
+
+
+        /** GetMouseY: returns the current Y
+         *  coordinate of the mouse position
+         */
+        public static int GetMouseY()
+        {
+            int posX = 0, posY = 0;
+            Sdl.SDL_PumpEvents();
+            Sdl.SDL_GetMouseState(out posX, out posY);
+            return posY;
+        }
+
+
+        /** MouseClicked: return TRUE if
+         *  the (left) mouse button has been clicked
+         */
+        public static bool MouseClicked()
+        {
+            int posX = 0, posY = 0;
+
+            Sdl.SDL_PumpEvents();
+
+            // To avoid two consecutive clicks
+            int now = Sdl.SDL_GetTicks();
+            if (now - lastMouseClick < mouseClickLapse)
+                return false;
+
+            // Ahora miro si realmente hay pulsación
+            if ((Sdl.SDL_GetMouseState(out posX, out posY) & Sdl.SDL_BUTTON(1)) == 1)
+            {
+                lastMouseClick = now;
+                return true;
+            }
             else
                 return false;
         }

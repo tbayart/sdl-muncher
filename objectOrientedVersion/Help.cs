@@ -9,7 +9,7 @@
  * 0.01, 21-dec-2012: Empty skeleton
  * 0.02, 21-dec-2012: Basic help screen, showing static text
  * 0.06, 01-feb-2013: Private "enhanced" enemy, which can fall and jump
- * 
+ * 0.14, 26-apr-2013: Example of mouse usage 
  */
 
 using System;
@@ -83,11 +83,13 @@ namespace Game
 
 
         JumpingEnemy myGhost;
+        Player myPac;
 
         public Help()
         {
             myGhost = new JumpingEnemy();
             myGhost.MoveTo(DateTime.Now.Millisecond % 750, 20);
+            myPac = new Player();
         }
 
         public void Run()
@@ -106,6 +108,17 @@ namespace Game
                     300, 540,
                     0x99, 0x99, 0x99,
                     sans18);
+
+                if (Hardware.GetMouseX() != -1)
+                {
+                    int xPac = Hardware.GetMouseX();
+                    int yPac = Hardware.GetMouseY();
+                    if (Hardware.MouseClicked())
+                        myPac.NextFrame();
+                    myPac.MoveTo(xPac, yPac);
+                    myPac.DrawOnHiddenScreen();
+                }
+                    
 
                 myGhost.DrawOnHiddenScreen();
                 myGhost.Move();
