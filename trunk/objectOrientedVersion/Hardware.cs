@@ -10,6 +10,8 @@
  *     Basic functions: init, clear, draw images, write text, fatal error
  * 0.10, 01-mar-2013: 
  *     Basic support for scrolling
+ * 0.13, 26-apr-2013: 
+ *     Joystick/gamepad support
  */
 using System.IO;
 using System.Threading;
@@ -24,6 +26,9 @@ namespace Game
         static short width, height;
 
         static short startX, startY; // For Scroll
+
+        static bool isThereJoystick;
+        static IntPtr joystick;
 
 
         public static void Init(short w, short h, int colors, bool fullScreen)
@@ -46,6 +51,19 @@ namespace Game
             Sdl.SDL_SetClipRect(hiddenScreen, ref rect2);
 
             SdlTtf.TTF_Init();
+
+            // Joystick initialization
+            isThereJoystick = true;
+            if (Sdl.SDL_NumJoysticks() < 1)
+                isThereJoystick = false;
+
+            if (isThereJoystick)
+            {
+                joystick = Sdl.SDL_JoystickOpen(0);
+                if (joystick == IntPtr.Zero)
+                    isThereJoystick = false;
+            }
+        
         }
 
         public static void ClearScreen()
@@ -140,6 +158,97 @@ namespace Game
         public static void ScrollVertically(short yDespl)
         {
             startY += yDespl;
+        }
+
+        // Joystick methods
+
+        /** JoyPulsado: devuelve TRUE si
+     *  ha sido pulsado un botón del jostick
+     *  (cualquiera, por ahora)
+     */
+        public static bool JoystickPressed(int boton)
+        {
+            if (!isThereJoystick)
+                return false;
+
+            if (Sdl.SDL_JoystickGetButton(joystick, boton) > 0)
+                return true;
+            else
+                return false;
+        }
+
+        /** ratonPulsado: devuelve TRUE si
+         *  ha sido pulsado un botón del ratón
+         */
+        public static bool JoystickMoved(out int posX, out int posY)
+        {
+            posX = 0; posY = 0;
+            if (!isThereJoystick)
+                return false;
+
+            posX = Sdl.SDL_JoystickGetAxis(joystick, 0);  // Leo valores (hasta 32768)
+            posY = Sdl.SDL_JoystickGetAxis(joystick, 1);
+            // Normalizo valores
+            if (posX == -32768) posX = -1;  // Normalizo, a -1, +1 o 0
+            else if (posX == 32767) posX = 1;
+            else posX = 0;
+            if (posY == -32768) posY = -1;
+            else if (posY == 32767) posY = 1;
+            else posY = 0;
+
+            if ((posX != 0) || (posY != 0))
+                return true;
+            else
+                return false;
+        }
+
+
+        public static bool JoystickMovedRight()
+        {            
+            if (!isThereJoystick)
+                return false;
+
+            int posX = 0, posY = 0;
+            if (JoystickMoved(out posX, out posY) && (posX == 1))
+                return true;
+            else
+                return false;
+        }
+
+        public static bool JoystickMovedLeft()
+        {
+            if (!isThereJoystick)
+                return false;
+
+            int posX = 0, posY = 0;
+            if (JoystickMoved(out posX, out posY) && (posX == -1))
+                return true;
+            else
+                return false;
+        }
+
+        public static bool JoystickMovedUp()
+        {
+            if (!isThereJoystick)
+                return false;
+
+            int posX = 0, posY = 0;
+            if (JoystickMoved(out posX, out posY) && (posY == -1))
+                return true;
+            else
+                return false;
+        }
+
+        public static bool JoystickMovedDown()
+        {
+            if (!isThereJoystick)
+                return false;
+
+            int posX = 0, posY = 0;
+            if (JoystickMoved(out posX, out posY) && (posY == 1))
+                return true;
+            else
+                return false;
         }
 
 
